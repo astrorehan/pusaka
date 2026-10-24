@@ -1,0 +1,103 @@
+  main { max-width: 1360px; margin: 0 auto; padding: 0 var(--gutter) 96px; }
+  .atas { max-width: 1360px; margin: 0 auto; }
+  /* Di sini kain yang menempel saat digulir, jadi kepala halaman ikut menggulir */
+  body > .atas { position: relative; }
+  body > .atas::before { display: none; }
+  .judul-halaman { padding-top: 20px; max-width: 46em; }
+  .judul-halaman h1 { font: 400 clamp(36px, 4vw, 56px)/1.02 var(--font-serif); letter-spacing: -.015em; }
+  .judul-halaman .t-lead { margin-top: 12px; font-size: 18px; }
+
+  .contoh { display: flex; gap: 8px; margin-top: 24px; overflow-x: auto; padding-bottom: 6px; scrollbar-width: none; }
+  .contoh::-webkit-scrollbar { display: none; }
+  .contoh button { flex: none; background: none; border: 1px solid var(--line-2); color: var(--text-2); padding: 8px 14px; border-radius: var(--r-pill); cursor: pointer; font-size: 14.5px; transition: border-color var(--dur-1), color var(--dur-1), background var(--dur-1); }
+  .contoh button:hover { border-color: var(--line-hover); color: var(--text); }
+  .contoh button[aria-pressed="true"] { background: var(--btn-bg); color: var(--btn-fg); border-color: transparent; }
+
+  /* Baris kedua 1fr: kalau kolom isian lebih panjang, sisa tinggi jatuh ke hasil, bukan jadi celah di bawah kain */
+  .kerja { display: grid; grid-template-columns: minmax(300px, 380px) minmax(0, 1fr); grid-template-rows: auto 1fr; grid-template-areas: "isi kain" "isi hasil"; gap: 0 56px; margin-top: 28px; align-items: start; }
+  .kain-blok { grid-area: kain; position: sticky; top: 16px; z-index: 4; }
+  .isian-blok { grid-area: isi; }
+  .hasil-blok { grid-area: hasil; }
+
+  /* Kain menempel saat digulir. Alasnya gambar latar yang sama (fixed), jadi baris yang lewat di bawahnya tertutup tanpa kotak terlihat */
+  .kain-blok::before {
+    content: ''; position: absolute; z-index: -1; inset: -16px -28px -64px; pointer-events: none;
+    background: var(--latar-gambar, none) 0 0 / 100vw 100vh no-repeat fixed, var(--bg);
+    -webkit-mask-image: linear-gradient(#000 calc(100% - 44px), transparent); mask-image: linear-gradient(#000 calc(100% - 44px), transparent);
+    opacity: 0; transition: opacity var(--dur-2);
+  }
+  .kain-blok.lekat::before { opacity: 1; }
+  .kain-bingkai { position: relative; }
+  .kain-pesan { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; padding: 0 12%; pointer-events: none; font: italic 400 clamp(19px, 2vw, 26px)/1.25 var(--font-serif); color: #6f675a; opacity: 0; }
+
+  /* Isian */
+  .harta { padding-bottom: 18px; border-bottom: 1px solid var(--line); }
+  .harta label { font-size: 14.5px; color: var(--text-3); }
+  .harta .rp { display: flex; align-items: baseline; gap: 6px; border-bottom: 1px solid var(--line-2); margin-top: 4px; transition: border-color var(--dur-1); }
+  .harta .rp:focus-within { border-bottom-color: var(--focus); }
+  .harta .rp span { font: 400 30px/1 var(--font-serif); color: var(--text-3); }
+  .harta input { flex: 1 1 auto; width: 0; min-width: 0; background: none; border: 0; outline: none; font: 400 40px/1.25 var(--font-serif); color: var(--text); padding: 4px 0; font-variant-numeric: lining-nums tabular-nums; }
+  .grup-isi { padding: 6px 0; border-bottom: 1px solid var(--line); }
+  .baris { display: flex; justify-content: space-between; align-items: center; gap: 16px; min-height: 54px; padding: 6px 0; }
+  .baris + .baris { border-top: 1px solid var(--line); }
+  .baris > span { font-size: 16px; min-width: 0; }
+  .baris > span small { display: block; color: var(--text-3); font-size: 13px; margin-top: 2px; line-height: 1.4; }
+  .baris.tumpuk { flex-wrap: wrap; padding: 12px 0; gap: 10px; }
+  .baris.tumpuk > span { flex: 1 1 100%; }
+  .baris.tumpuk .segmen { display: flex; width: 100%; }
+  .baris.tumpuk .segmen label { flex: 1 1 0; }
+  .baris.tumpuk .segmen span { text-align: center; }
+  details.lanjutan { border-bottom: 1px solid var(--line); }
+  details.lanjutan summary { cursor: pointer; padding: 16px 0; color: var(--text-2); list-style: none; display: flex; align-items: center; gap: 10px; font-size: 15.5px; }
+  details.lanjutan summary::-webkit-details-marker { display: none; }
+  details.lanjutan summary::before { content: ''; width: 7px; height: 7px; border-right: 1.4px solid currentColor; border-bottom: 1.4px solid currentColor; transform: rotate(-45deg); transition: transform var(--dur-2); margin: 0 4px 0 2px; }
+  details.lanjutan[open] summary::before { transform: rotate(45deg); }
+  details.lanjutan .isi-l { padding-bottom: 8px; }
+  .pilih { appearance: none; -webkit-appearance: none; background: transparent url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%2397a4c3' stroke-width='1.4'/%3E%3C/svg%3E") no-repeat right 4px center; border: 0; border-bottom: 1px solid var(--line-2); height: 40px; padding: 0 26px 0 2px; color: var(--text); font-size: 15.5px; cursor: pointer; border-radius: 0; }
+  .pilih option { background: var(--surface); color: var(--text); }
+
+  /* Kain + hasil */
+  .kain-blok .kain-host { width: 100%; }
+  .alur { display: flex; flex-wrap: wrap; gap: 0; margin-top: 18px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  .alur[hidden] { display: none; }
+  .alur div { flex: 1 1 0; min-width: 120px; padding: 12px 16px 12px 0; display: flex; flex-direction: column; }
+  .alur div + div { padding-left: 16px; border-left: 1px solid var(--line); }
+  .alur small { display: block; font-size: 13px; color: var(--text-3); }
+  /* angka selalu sejajar di dasar sel walau labelnya terlipat dua baris */
+  .alur b { display: block; margin-top: auto; padding-top: 2px; font: 400 22px/1.2 var(--font-serif); font-variant-numeric: lining-nums; }
+  .rincian { margin-top: 8px; }
+  .rincian .r { display: grid; grid-template-columns: 14px minmax(0, 1fr) auto; gap: 4px 14px; padding: 14px 6px 14px 4px; border-bottom: 1px solid var(--line); transition: background var(--dur-1); }
+  .rincian .r.sorot { background: var(--wash); }
+  .rincian .r i { width: 14px; height: 14px; margin-top: 4px; box-shadow: inset 0 0 0 1px rgb(255 255 255 / .12); }
+  .rincian .r .nama b { font-weight: 500; font-size: 17px; }
+  .rincian .r .nama .frac { margin-left: 10px; color: var(--text-2); font-size: 17px; }
+  .rincian .r .rp { font-weight: 500; font-size: 17px; font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
+  .rincian .r p { grid-column: 2 / -1; color: var(--text-3); font-size: 14.5px; line-height: 1.5; max-width: 52em; }
+  .catatan { margin-top: 18px; display: grid; gap: 8px; }
+  .catatan p { font-size: 14.5px; color: var(--text-2); border-left: 2px solid var(--prada-500); padding: 2px 0 2px 12px; line-height: 1.5; }
+  .tolak-blok { margin-top: 18px; }
+  .tolak-blok h2 { font: 400 26px/1.2 var(--font-serif); }
+  .tolak-blok .tolak { margin-top: 12px; font-size: 16px; line-height: 1.55; }
+  .tolak-blok p.redup { margin-top: 12px; font-size: 15px; line-height: 1.55; max-width: 40em; }
+  .kaki { margin-top: 36px; display: grid; gap: 10px; }
+
+  .tema-tombol .segmen span { padding: 5px 12px; font-size: 13.5px; }
+
+  @media (max-width: 860px) {
+    .kerja { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto; grid-template-areas: "kain" "isi" "hasil"; gap: 0; }
+    .isian-blok .baris, .isian-blok summary, .harta { scroll-margin-top: calc(var(--tinggi-kain, 160px) + 24px); }
+    .kain-blok { top: 0; z-index: 5; padding: 10px var(--gutter) 14px; margin: 0 calc(var(--gutter) * -1); }
+    .kain-blok::before { inset: 0 0 -40px; -webkit-mask-image: linear-gradient(#000 calc(100% - 28px), transparent); mask-image: linear-gradient(#000 calc(100% - 28px), transparent); }
+    .isian-blok { margin-top: 8px; }
+    .hasil-blok { margin-top: 28px; }
+    .contoh { margin-left: calc(var(--gutter) * -1); margin-right: calc(var(--gutter) * -1); padding-left: var(--gutter); padding-right: var(--gutter); scroll-padding-inline: var(--gutter); }
+  }
+  @media (max-width: 520px) {
+    .atas .konteks .garis-v, .atas .konteks > span { display: none; }
+    .harta input { font-size: 34px; }
+    .alur { display: grid; grid-template-columns: 1fr 1fr; }
+    .alur div:nth-child(odd) { padding-left: 0; border-left: 0; }
+    .alur div:nth-child(n+3) { border-top: 1px solid var(--line); }
+    .alur div:last-child:nth-child(odd) { grid-column: 1 / -1; }
+    .rincian .r .nama .frac { display: block; margin-left: 0; margin-top: 2px; font-size: 16px; }
+  }

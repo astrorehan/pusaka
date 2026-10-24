@@ -1,0 +1,59 @@
+  main { max-width: 1440px; margin: 0 auto; padding: 0 var(--gutter) 96px; }
+  .atas { max-width: 1440px; margin: 0 auto; }
+  .judul-halaman { padding-top: 24px; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 24px 48px; align-items: end; }
+  .judul-halaman h1 { font: 400 clamp(34px, 3.5vw, 52px)/1.04 var(--font-serif); letter-spacing: -.012em; margin-top: 12px; }
+  .judul-halaman .t-lead { margin-top: 12px; font-size: 18px; max-width: 42em; }
+  .judul-halaman .t-lead b { font-weight: 500; color: var(--text); }
+  .progres { text-align: right; }
+  .progres .titik { display: flex; gap: 10px; justify-content: flex-end; }
+  .progres .titik i { width: 12px; height: 12px; border-radius: 50%; border: 1.4px solid var(--text-3); transition: background var(--dur-3), border-color var(--dur-3); }
+  .progres .titik i.ya { background: var(--prada-300); border-color: var(--prada-300); }
+  .progres p { margin-top: 10px; font-size: 15px; color: var(--text-2); }
+  .progres .hitung { font: 400 64px/1 var(--font-serif); display: flex; justify-content: flex-end; }
+  .progres .hitung span { display: inline-block; width: .6em; text-align: center; }
+  .progres .hitung span.titik { width: .3em; }
+
+  /* Kain akta: tiga tempat cap */
+  .akta { position: relative; margin-top: 30px; }
+  .akta .cap-lapis { position: absolute; left: 0; top: 0; overflow: visible; pointer-events: none; }
+  .akta .cap { color: #b59c6c; }
+
+  .kartu-saksi { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; margin-top: 28px; }
+  .ks { padding: 22px 22px 20px; display: flex; flex-direction: column; min-width: 0; }
+  .ks h2 { font: 400 26px/1.15 var(--font-serif); }
+  .ks .siapa { margin-top: 4px; font-size: 14.5px; color: var(--text-3); }
+  .ks .bagian { margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--line); }
+  .ks .bagian > span { font-size: 14px; color: var(--text-3); }
+  .berkas { margin-top: 8px; display: flex; align-items: center; gap: 12px; padding: 10px 12px; border: 1px dashed var(--line-2); }
+  .berkas svg { width: 18px; height: 18px; flex: none; color: var(--text-3); }
+  .berkas b { font-weight: 500; font-size: 15px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
+  .berkas button { font-size: 14px; }
+  .sidik { margin-top: 10px; font-size: 14px; color: var(--text-2); font-variant-numeric: tabular-nums; }
+  .sidik small { display: block; color: var(--text-3); font-size: 13px; margin-top: 4px; line-height: 1.45; }
+  .ks .aksi { margin-top: auto; padding-top: 18px; }
+  .ks .tahan { --b-bg: transparent; --b-fg: var(--text); --b-line: var(--line-2); width: 100%; min-height: 54px; }
+  .ks .tahan:hover { --b-bg: var(--wash); --b-line: var(--line-hover); }
+  .ks .hasil { display: none; }
+  .ks.ya .hasil { display: block; }
+  .ks.ya .tahan, .ks.ya .berkas button { display: none; }
+  .hasil p { display: flex; gap: 10px; align-items: center; font-size: 16px; }
+  .hasil p svg { width: 16px; height: 16px; color: var(--prada-300); flex: none; }
+  .hasil small { display: block; margin-top: 6px; color: var(--text-3); font-size: 13.5px; font-variant-numeric: tabular-nums; }
+  .ks .ket-aksi { margin-top: 10px; font-size: 13.5px; color: var(--text-3); min-height: 1.4em; line-height: 1.45; }
+  .ks.mati .tahan { opacity: .35; pointer-events: none; }
+
+  .lanjut { margin-top: 48px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+  .lanjut > div { padding-top: 22px; border-top: 1px solid var(--line); }
+  .lanjut h2 { font: 400 23px/1.2 var(--font-serif); }
+  .lanjut p { margin-top: 8px; color: var(--text-2); font-size: 15.5px; line-height: 1.55; max-width: 34em; }
+  .lanjut .btn { margin-top: 16px; }
+
+  @media (max-width: 1000px) {
+    .kartu-saksi, .lanjut { grid-template-columns: 1fr; }
+    .judul-halaman { grid-template-columns: 1fr; }
+    .progres { text-align: left; }
+    .progres .titik, .progres .hitung { justify-content: flex-start; }
+  }
+  @media (max-width: 640px) {
+    .atas .jaringan, .atas .konteks .garis-v, .atas .konteks span { display: none; }
+  }

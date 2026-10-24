@@ -1,0 +1,84 @@
+  /* Artboard 1920×1080 diskalakan agar pas di proyektor apa pun */
+  html, body { height: 100%; overflow: hidden; }
+  body { background: var(--bg-deep); }
+  /* Wadah tetap yang memotong: ukuran asli papan tidak ikut melebarkan layar (penting di HP) */
+  .wadah-panggung { position: fixed; inset: 0; overflow: hidden; }
+  .artboard { position: absolute; left: 50%; top: 50%; width: 1920px; height: 1080px; transform-origin: 0 0; }
+
+  .pg-atas { position: absolute; left: 80px; right: 80px; top: 44px; display: flex; justify-content: space-between; align-items: center; }
+  .pg-atas .merek b { font-size: 27px; }
+  .pg-atas .merek svg { width: 26px; height: 26px; }
+  .blok { font: 400 17px/1 var(--font-sans); color: var(--text-3); display: flex; gap: 12px; align-items: baseline; }
+  .blok b { font-weight: 500; color: var(--text-2); font-variant-numeric: tabular-nums; }
+  .blok i { width: 7px; height: 7px; border-radius: 50%; background: var(--nila-400); display: inline-block; transform: translateY(-2px); }
+
+  .pg-judul { position: absolute; left: 80px; top: 112px; width: 1120px; }
+  .pg-judul h1 { font: 400 66px/1 var(--font-serif); letter-spacing: -.015em; }
+  .narasi { margin-top: 18px; font: 400 32px/1.25 var(--font-serif); font-style: italic; color: var(--text-2); min-height: 40px; }
+
+  .pg-status { position: absolute; right: 80px; top: 104px; width: 600px; text-align: right; }
+  .pg-status .status { font-size: 19px; justify-content: flex-end; }
+  .hitung { font: 400 118px/1 var(--font-serif); margin-top: 6px; display: flex; justify-content: flex-end; height: 0; overflow: hidden; opacity: 0; }
+  .hitung span { display: inline-block; width: .6em; text-align: center; }
+  .hitung span.titik { width: .3em; }
+  /* Dua baris: yang tetap (bukti hidup apa, batasnya) dan yang berdetak (sudah berapa lama) */
+  .ket-status { font: 400 18px/1.4 var(--font-sans); color: var(--text-3); margin-top: 10px; }
+  .ket-status .k1 { color: var(--text-2); }
+  .ket-status .k1 b { font-weight: 500; color: var(--text); }
+  .ket-status .k2 { margin-top: 2px; font-size: 17px; font-variant-numeric: tabular-nums; }
+  .ket-status .k2:empty { display: none; }
+  .saksi { display: flex; justify-content: flex-end; gap: 26px; margin-top: 18px; }
+  .saksi div { display: grid; justify-items: end; gap: 6px; font: 400 15px/1.2 var(--font-sans); color: var(--text-3); }
+  .saksi svg { width: 26px; height: 26px; overflow: visible; }
+  .saksi .ya { color: var(--text-2); }
+  /* Ringkasan pencairan (setelah dibagikan), di tempat hitung mundur dan saksi tadi */
+  .ringkas { height: 0; opacity: 0; overflow: hidden; }
+  .ringkas .r1 { font: 400 25px/1.25 var(--font-serif); color: var(--text); }
+  .ringkas .r2 { font: 400 18px/1.4 var(--font-sans); color: var(--text-2); margin-top: 4px; white-space: nowrap; }
+  .ringkas .r2:empty { display: none; }
+  .ringkas .r3 { font: 400 14px/1.4 var(--font-sans); color: var(--text-3); margin-top: 10px; letter-spacing: .01em; }
+  .btn-bagikan { margin-top: 18px; min-height: 64px; padding: 0 34px; font-size: 20px; opacity: 0; pointer-events: none; }
+  .btn-bagikan.on { pointer-events: auto; }
+
+  .pg-kain { position: absolute; left: 80px; top: 296px; }
+  /* Supergrafis: kawung raksasa di belakang kain. Menyala per kelopak saat warisan dibagikan. */
+  .artboard { isolation: isolate; }
+  .artboard > .kawung-besar { left: 1010px; top: -170px; width: 1420px; z-index: 0; opacity: 0; }
+  .artboard > .kawung-besar .kb-k { fill: rgb(255 248 236 / .045); stroke: rgb(255 248 236 / .12); stroke-width: .04; }
+  .artboard > .kawung-besar .kb-k.nyala { fill: rgb(227 202 142 / .13); stroke: rgb(240 220 170 / .6); stroke-width: .06; }
+  .artboard > .kawung-besar.selesai svg { filter: drop-shadow(0 0 60px rgb(227 202 142 / .3)); }
+
+  .pg-tali { position: absolute; inset: 0; width: 1920px; height: 1080px; pointer-events: none; overflow: visible; }
+  .label-kain.pg { position: absolute; width: 176px; padding: 24px 10px 12px; }
+  .label-kain.pg.lebar { width: 224px; }
+  .label-kain.pg .pita { position: absolute; left: 0; right: 0; top: 0; height: 6px; }
+  .label-kain.pg .peran { font: 500 17px/1.2 var(--font-sans); color: var(--nila-800); white-space: nowrap; }
+  .label-kain.pg .frac { display: block; font-size: 21px; line-height: 1.2; color: var(--soga-700); margin-top: 3px; }
+  .label-kain.pg .nominal { display: block; font: 400 21px/1.1 var(--font-serif); color: var(--nila-400); margin-top: 6px; white-space: nowrap; transform-origin: 0 100%; }
+  .label-kain.pg.terima .nominal { color: var(--nila-900); }
+  /* Satu baris di bawah nominal: cara terima sebelum dibagikan, kabar pencairannya sesudahnya */
+  .label-kain.pg .cara { margin-top: 8px; font: 500 16px/1.25 var(--font-sans); letter-spacing: -.01em; color: var(--nila-500); white-space: nowrap; overflow: hidden; min-height: 20px; }
+  .label-kain.pg .cara .t { display: inline-block; }
+  .label-kain.pg .cara[data-f="proses"], .label-kain.pg .cara[data-f="tunggu"], .label-kain.pg .cara[data-f="dompet"] { font-weight: 400; }
+  .label-kain.pg .cara[data-f="selesai"] { color: var(--nila-900); }
+
+  .lini { position: absolute; left: 80px; right: 80px; bottom: 26px; display: flex; gap: 48px; font: 400 15px/1 var(--font-sans); color: var(--text-3); white-space: nowrap; overflow: hidden; }
+  .lini span b { font-weight: 500; color: var(--text-2); margin-right: 10px; font-variant-numeric: tabular-nums; }
+
+  /* Fase pindai: label besar ber-QR */
+  .pg-qr { position: absolute; inset: 0; pointer-events: none; }
+  .pg-qr .ajak { position: absolute; left: 80px; top: 300px; width: 860px; }
+  .pg-qr .ajak h2 { font: 400 84px/1 var(--font-serif); letter-spacing: -.02em; }
+  .pg-qr .ajak p { font: 400 27px/1.45 var(--font-sans); color: var(--text-2); margin-top: 26px; max-width: 30em; }
+  .pg-qr .ajak p.inti { font: italic 400 40px/1.2 var(--font-serif); color: var(--text); margin-top: 38px; }
+  .pg-qr .ajak p.kecil { font-size: 20px; line-height: 1.5; color: var(--text-3); margin-top: 34px; }
+  .pg-qr .tag { position: absolute; left: 1120px; top: 150px; width: 720px; padding: 44px 48px 40px; transform-origin: 50% 0; }
+  .pg-qr .tag svg.qr { width: 100%; height: auto; display: block; }
+  .pg-qr .tag .t { margin-top: 22px; font: 400 30px/1.2 var(--font-serif); color: var(--nila-900); }
+  .pg-qr .tag .u { margin-top: 8px; font: 500 20px/1.3 var(--font-sans); color: var(--nila-500); }
+  .pg-qr .tali-qr { position: absolute; left: 1478px; top: -10px; width: 4px; height: 171px; }
+
+  .panel-demo { left: auto; right: 12px; }
+  /* Di proyektor tab tertutup pindah ke tepi kanan dan nyaris tak terlihat penonton */
+  .panel-demo:not([open]) { left: auto; right: 0; border-left: 1px solid rgb(245 239 227 / .22); border-right: 0; opacity: .22; }
+  .pintas { position: absolute; right: 80px; bottom: 26px; font: 400 13px/1 var(--font-sans); color: var(--nila-400); opacity: .0; }

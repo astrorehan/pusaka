@@ -1,0 +1,92 @@
+  body { font-size: 16px; }
+  main { max-width: 440px; margin: 0 auto; padding: max(18px, env(safe-area-inset-top)) 20px 40px; }
+  .atas { display: flex; justify-content: space-between; align-items: center; height: 44px; min-height: 0; padding: 0; }
+  .atas .t-micro { font-size: 12px; }
+
+  /* Pemilih peran */
+  .pilih h1 { font: 400 40px/1.05 var(--font-serif); letter-spacing: -.01em; margin-top: 34px; }
+  .pilih .t-lead { margin-top: 12px; font-size: 17px; }
+  .daftar { margin-top: 28px; border-top: 1px solid var(--line); }
+  .daftar button { width: 100%; display: grid; grid-template-columns: 52px 1fr auto; gap: 16px; align-items: center; padding: 14px 0; background: none; border: 0; border-bottom: 1px solid var(--line); text-align: left; cursor: pointer; }
+  .daftar button:active { background: rgb(245 239 227 / .04); }
+  .daftar .cth { width: 52px; height: 52px; }
+  .daftar b { font: 400 23px/1.1 var(--font-serif); display: block; }
+  .daftar .kanal { display: block; margin-top: 3px; font-size: 13.5px; line-height: 1.35; color: var(--text-3); }
+  .daftar .st { display: flex; align-items: center; gap: 7px; margin-top: 4px; font-size: 13.5px; line-height: 1.3; color: var(--text-2); }
+  .daftar .st i { width: 7px; height: 7px; border-radius: 50%; background: var(--mori-300); flex: none; }
+  .daftar .st[data-s="proses"] i { background: var(--prada-500); animation: denyut 1.6s var(--ease-angkat) infinite; }
+  .daftar .st[data-s="belum"] i { background: transparent; border: 1.5px solid var(--text-3); }
+  .daftar .frac { color: var(--text-2); font-size: 18px; }
+  html.diam .daftar .st i, html.diam .urut i { animation: none !important; }
+
+  /* Tampilan ahli waris */
+  .ahli .sapa { margin-top: 26px; font-size: 15px; color: var(--text-3); }
+  .ahli h1 { font: 400 44px/1.02 var(--font-serif); letter-spacing: -.01em; margin-top: 4px; }
+  .ahli .dari { margin-top: 6px; font-size: 16px; color: var(--text-2); }
+  .contoh-wrap { margin: 26px -4px 0; display: flex; justify-content: center; }
+  .nominal-blok { margin-top: 26px; }
+  .nominal-blok .lbl { font-size: 14.5px; color: var(--text-3); }
+  .nominal { font: 400 46px/1.05 var(--font-serif); margin-top: 4px; letter-spacing: -.01em; white-space: nowrap; }
+  .nominal.calon { color: var(--text-2); }
+  .nominal-blok .rinci { margin-top: 6px; font-size: 15px; color: var(--text-2); }
+  a.tx { display: inline-block; margin-top: 12px; font-size: 15px; color: var(--text); text-underline-offset: 5px; text-decoration-color: var(--line-2); }
+
+  /* Kartu cara menerima */
+  .cara { margin-top: 28px; padding: 18px 18px 20px; }
+  .cara h2 { font: 400 23px/1.22 var(--font-serif); letter-spacing: -.005em; margin-top: 8px; overflow-wrap: anywhere; }
+  .nb { white-space: nowrap; }
+  .cara .sub { margin-top: 3px; font-size: 15px; color: var(--text-2); }
+  .cara .isi { margin-top: 14px; font-size: 15px; line-height: 1.6; color: var(--text-2); }
+  .cara .status { margin-top: 14px; }
+  .cara .kecil { margin-top: 14px; font-size: 12.5px; line-height: 1.5; color: var(--text-3); }
+  .cara a.tx { margin-top: 10px; }
+
+  /* Urutan: titik prada = langkah yang sedang berjalan, teks redup = belum */
+  .urut { list-style: none; padding: 0; margin: 16px 0 0; }
+  .urut li { position: relative; display: grid; grid-template-columns: 9px 1fr; gap: 14px; padding-bottom: 16px; color: var(--text-3); transition: color var(--dur-3) var(--ease-resap); }
+  .urut li:last-child { padding-bottom: 0; }
+  .urut li::before { content: ''; position: absolute; left: 4px; top: 18px; bottom: -7px; width: 1px; background: var(--line-2); }
+  .urut li:last-child::before { display: none; }
+  .urut i { width: 9px; height: 9px; margin-top: 7px; border-radius: 50%; border: 1.5px solid var(--line-2); transition: background var(--dur-3), border-color var(--dur-3); }
+  .urut b { display: block; font-weight: 400; font-size: 16px; line-height: 1.45; }
+  .urut small { display: block; margin-top: 1px; font-size: 13px; line-height: 1.45; color: var(--text-3); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+  .urut li[data-s="selesai"] { color: var(--text-2); }
+  .urut li[data-s="selesai"] i { background: var(--mori-300); border-color: transparent; box-shadow: 0 0 0 3px var(--wash); }
+  .urut li[data-s="kini"] { color: var(--text); }
+  .urut li[data-s="kini"] i { background: var(--prada-500); border-color: transparent; animation: denyut 1.6s var(--ease-angkat) infinite; }
+  /* langkah terakhir yang sudah tercapai: tempat uangnya tiba, titik prada diam */
+  .urut li:last-child[data-s="selesai"] { color: var(--text); }
+  .urut li:last-child[data-s="selesai"] i { background: var(--prada-500); box-shadow: 0 0 0 3px rgb(196 161 90 / .16); }
+
+  /* Formulir pencairan */
+  .cair { margin-top: 18px; display: grid; gap: 16px; }
+  .cair .isian input, .cair .isian select { font-size: 16px; }
+  .cair .tahan { --b-bg: transparent; --b-fg: var(--text); --b-line: var(--line-2); width: 100%; min-height: 58px; padding: 10px 16px; line-height: 1.3; text-align: center; margin-top: 2px; }
+  .cair .tahan:hover { --b-bg: var(--wash); --b-line: var(--line-hover); }
+  .cair .kecil { margin-top: -4px; }
+  .cair .tolak { font-size: 14.5px; line-height: 1.5; }
+  .buka { margin-top: 18px; border-top: 1px solid var(--line); }
+  .buka summary { list-style: none; cursor: pointer; min-height: 48px; display: flex; align-items: center; justify-content: space-between; gap: 12px; font-size: 15.5px; color: var(--text); }
+  .buka summary::-webkit-details-marker { display: none; }
+  .buka summary::after { content: ''; width: 8px; height: 8px; flex: none; border-right: 1.5px solid var(--text-3); border-bottom: 1.5px solid var(--text-3); transform: translateY(-2px) rotate(45deg); transition: transform var(--dur-2) var(--ease-resap); }
+  .buka[open] summary::after { transform: translateY(2px) rotate(225deg); }
+  .buka .isi { margin-top: 2px; }
+
+  .kartu { margin-top: 20px; padding: 18px 18px 20px; }
+  .kartu .hitung { font: 400 54px/1 var(--font-serif); margin-top: 12px; display: flex; }
+  .kartu .hitung span { display: inline-block; width: .6em; text-align: center; }
+  .kartu .hitung span.titik { width: .3em; }
+  .kartu .jalur { height: 2px; background: var(--line); margin-top: 14px; position: relative; overflow: hidden; }
+  .kartu .jalur i { position: absolute; inset: 0 auto 0 0; width: 0; background: var(--prada-500); }
+  .kartu p { margin-top: 12px; font-size: 15px; color: var(--text-2); line-height: 1.55; }
+
+  .alasan { margin-top: 36px; }
+  .alasan h2 { font: 400 26px/1.15 var(--font-serif); }
+  .alasan p { margin-top: 10px; color: var(--text-2); font-size: 16px; line-height: 1.6; }
+  .alasan svg.peta { width: 100%; height: auto; margin-top: 18px; }
+  .rincian { margin-top: 16px; display: grid; grid-template-columns: 1fr auto; gap: 9px 12px; font-size: 15px; }
+  .rincian span:nth-child(2n) { text-align: right; font-variant-numeric: tabular-nums; color: var(--text-2); }
+  .rincian .saya { color: var(--text); }
+  .rincian .saya + span { color: var(--text); }
+  .kaki { margin-top: 36px; }
+  [hidden] { display: none !important; }

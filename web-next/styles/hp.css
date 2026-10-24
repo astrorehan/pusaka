@@ -1,0 +1,12 @@
+  body { background: var(--bg-deep); }
+  header { padding: 18px 32px 0; display: flex; gap: 6px 24px; align-items: baseline; flex-wrap: wrap; }
+  header h1 { font: 400 26px/1.1 var(--font-serif); }
+  header p { color: var(--text-3); font-size: 14.5px; max-width: 64em; }
+  header kbd { font: inherit; padding: 0 5px; border: 1px solid var(--line-2); border-radius: 3px; color: var(--text-2); }
+  /* --k dihitung di skrip agar empat HP muat satu layar (maksimal 1); makin sempit: 2 kolom, lalu 1 kolom */
+  .deret { --k: 1; display: grid; grid-template-columns: repeat(4, max-content); justify-content: center; gap: 26px 28px; padding: 18px 24px 56px; }
+  .hp { width: calc(390px * var(--k) + 20px); }
+  .hp select { display: block; width: 100%; margin-bottom: 10px; background: transparent; color: var(--text-2); border: 1px solid var(--line-2); height: 34px; padding: 0 8px; font-size: 13.5px; }
+  .hp select option { background: var(--nila-850); }
+  .hp .bingkai { width: calc(390px * var(--k) + 20px); height: calc(844px * var(--k) + 20px); border: 10px solid #070b16; border-radius: 46px; overflow: hidden; background: var(--bg); box-shadow: 0 0 0 1px rgb(255 255 255 / .08), 0 40px 70px -30px #000; }
+  .hp iframe { width: 390px; height: 844px; border: 0; transform: scale(var(--k)); transform-origin: 0 0; display: block; }

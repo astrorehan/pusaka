@@ -1,0 +1,74 @@
+  body { font-size: 16px; }
+  main { max-width: 440px; margin: 0 auto; padding: max(18px, env(safe-area-inset-top)) 20px max(44px, env(safe-area-inset-bottom)); }
+  .atas { height: 44px; min-height: 0; padding: 0; gap: 12px; }
+  .atas .jaringan { font-size: 13px; gap: 8px; }
+
+  /* Sapaan */
+  .sambut { margin-top: 28px; }
+  .sambut .sapa { font-size: 15px; color: var(--text-3); min-height: 1.5em; }
+  .sambut h1 { font: 400 38px/1.06 var(--font-serif); letter-spacing: -.01em; margin-top: 4px; }
+  .sambut .lead { margin-top: 12px; font-size: 17px; line-height: 1.55; color: var(--text-2); }
+
+  /* Satu kartu yang harus dilihat sekarang: terpicu, saksi menunggu, atau pengingat */
+  .kartu-aksi { margin-top: 26px; padding: 18px 18px 20px; }
+  .kartu-aksi.siaga { border-left: 3px solid var(--prada-500); padding-left: 16px; }
+  .kartu-aksi h2 { font: 400 25px/1.16 var(--font-serif); letter-spacing: -.005em; margin-top: 14px; }
+  .kartu-aksi .isi { margin-top: 8px; font-size: 15.5px; line-height: 1.55; color: var(--text-2); }
+  .hitung { display: flex; margin-top: 18px; font: 400 56px/1 var(--font-serif); }
+  .hitung span { display: inline-block; width: .6em; text-align: center; }
+  .hitung span.titik { width: .3em; }
+  .ket-hitung { margin-top: 6px; font-size: 14px; color: var(--text-3); }
+  .kartu-aksi .tahan { --b-bg: transparent; --b-fg: var(--text); --b-line: var(--line-2); width: 100%; min-height: 58px; margin-top: 18px; padding: 12px 18px; font-size: 17px; line-height: 1.3; }
+  .kartu-aksi .tahan:hover { --b-bg: var(--wash); --b-line: var(--line-hover); }
+  .ket-aksi { margin-top: 10px; font-size: 13.5px; line-height: 1.5; color: var(--text-3); }
+  .pratinjau { margin-top: 10px; }
+
+  /* Kartu status yang tenang */
+  .kartu-status { margin-top: 26px; padding: 16px 18px 4px; }
+  .kartu-status dl { margin: 12px 0 0; }
+  .kartu-status dl > div { padding: 12px 0 14px; border-top: 1px solid var(--line); }
+  .kartu-status dt { font-size: 13.5px; color: var(--text-3); }
+  .kartu-status .nilai { display: block; margin-top: 3px; font: 400 24px/1.2 var(--font-serif); }
+  .kartu-status .ket { display: block; margin-top: 4px; font-size: 14px; line-height: 1.5; color: var(--text-2); }
+
+  .catatan-baca { margin-top: 26px; padding: 14px 16px; font-size: 15px; line-height: 1.55; color: var(--text-2); }
+
+  /* Sidik jari (passkey) */
+  .sidik { margin-top: 22px; padding: 16px 18px 18px; display: grid; grid-template-columns: auto 1fr; gap: 4px 14px; align-items: start; }
+  .sidik > svg { grid-row: span 3; width: 30px; height: 30px; margin-top: 2px; color: var(--text-2); }
+  .sidik h2 { font: 400 20px/1.2 var(--font-serif); }
+  .sidik .isi { font-size: 14.5px; line-height: 1.5; color: var(--text-2); }
+  .sidik .btn { justify-self: start; margin-top: 8px; }
+  .sidik[data-aktif] > svg { color: var(--soga-400); }
+
+  /* Pembayaran contoh */
+  .bayar { margin-top: 22px; }
+  .bayar .btn { min-height: 56px; padding: 10px 18px; line-height: 1.3; text-align: center; }
+  .bayar .btn .dua { display: grid; gap: 3px; }
+  .bayar .btn small { font: 400 13.5px/1.3 var(--font-sans); color: var(--text-2); }
+
+  /* Kabar dari Pusaka */
+  .kabar { margin-top: 38px; }
+  .kabar-kepala { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+  .kabar-kepala h2 { font: 400 25px/1.15 var(--font-serif); }
+  #feed { list-style: none; padding: 0; margin: 14px 0 0; display: grid; gap: 10px; }
+  .pesan { padding: 12px 14px 13px; background: var(--surface); border: 1px solid var(--line); }
+  .pesan-kepala { display: flex; align-items: center; gap: 7px; }
+  .pesan-kepala svg { width: 15px; height: 15px; color: var(--text-3); flex: none; }
+  .pesan-kepala b { font: 500 13.5px/1 var(--font-sans); color: var(--text-2); }
+  .pesan-kepala time { margin-left: auto; font-size: 12.5px; color: var(--text-3); font-variant-numeric: tabular-nums; }
+  .pesan-teks { margin-top: 8px; font-size: 16px; line-height: 1.5; }
+  .pesan-catatan { margin-top: 6px; font-size: 13.5px; line-height: 1.5; color: var(--text-3); }
+  .pesan[data-j="dipicu"] { border-left: 3px solid var(--prada-500); background: var(--surface-2); }
+  .pesan[data-j="batal"] { border-left: 3px solid var(--line-hover); }
+  .pesan[data-j="dibagikan"] { border-left: 3px solid var(--soga-400); }
+  .kosong { margin-top: 14px; padding: 14px 16px; border: 1px dashed var(--line-2); font-size: 15px; line-height: 1.5; color: var(--text-3); }
+
+  /* Khusus presentasi */
+  .presentasi { margin-top: 34px; padding-top: 14px; border-top: 1px solid var(--line); }
+  .presentasi summary { cursor: pointer; font-size: 13px; color: var(--text-3); list-style: none; width: max-content; }
+  .presentasi summary::-webkit-details-marker { display: none; }
+  .presentasi summary:hover { color: var(--text-2); }
+  .presentasi[open] summary { margin-bottom: 10px; }
+  .presentasi p { margin-bottom: 12px; font-size: 13.5px; line-height: 1.5; color: var(--text-3); }
+  .kaki { margin-top: 28px; }

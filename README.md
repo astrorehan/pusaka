@@ -17,10 +17,10 @@ Dibuat di **Monad Blitz Jogja Vol. 2**, Sabtu 24 Oktober 2026, GIK UGM.
 | | |
 |---|---|
 | Demo live | _menyusul_ |
-| Jaringan | Monad testnet (chain id 10143) |
-| `PusakaWallet` | _menyusul_ |
-| `MitraCair` | _menyusul_ |
-| `MockIDR` (tIDR) | _menyusul_ |
+| Jaringan | Monad testnet (chain id 10143) · source terverifikasi di Sourcify |
+| `PusakaWallet` | [`0xeea3b2c6040B0eACb3E451A6f13bA11db547e096`](https://testnet.monadvision.com/address/0xeea3b2c6040B0eACb3E451A6f13bA11db547e096) |
+| `MitraCair` | [`0x04405E9Fd9ed041F81086259Bf200990B9EC315F`](https://testnet.monadvision.com/address/0x04405E9Fd9ed041F81086259Bf200990B9EC315F) |
+| `MockIDR` (tIDR) | [`0xbEe6644173F8eB599d83B9a6A92e7BE14b4242aB`](https://testnet.monadvision.com/address/0xbEe6644173F8eB599d83B9a6A92e7BE14b4242aB) |
 
 ## Isi folder
 

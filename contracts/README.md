@@ -46,5 +46,11 @@ Dengan `BRANKAS=false` (PowerShell: `$env:BRANKAS="false"`), skrip melewati `Pus
 hanya men-deploy `MockIDR`, `PusakaWallet`, `MitraCair` (±12 jt gas, ±1,2 MON). Model dompet tidak membutuhkan
 keduanya.
 
+Verifikasi source di explorer (Sourcify Monad), untuk tiap kontrak:
+
+```bash
+forge verify-contract <alamat> src/PusakaWallet.sol:PusakaWallet --chain 10143 --rpc-url monad_testnet   --verifier sourcify --verifier-url https://sourcify-api-monad.blockvision.org --guess-constructor-args
+```
+
 Skrip mencetak empat baris `VITE_TOKEN`, `VITE_FACTORY`, `VITE_WALLET`, `VITE_MITRA` untuk `web/.env.local`. Akun yang
 men-deploy menjadi pemilik `MitraCair` (bisa menambah operator).

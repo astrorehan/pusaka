@@ -67,7 +67,7 @@ produk, mitranya penukar berizin yang memverifikasi nama rekening (dan KYC sesua
 13. [Demo & pitch](#13-demo--pitch)
 14. [Aturan Blitz & checklist pengumpulan](#14-aturan-blitz--checklist-pengumpulan)
 15. [Risiko & mitigasi](#15-risiko--mitigasi)
-16. [Roadmap setelah hackathon](#16-roadmap-setelah-hackathon)
+16. [Roadmap setelah hackathon & model bisnis](#16-roadmap-setelah-hackathon)
 17. [Keputusan yang masih terbuka](#17-keputusan-yang-masih-terbuka)
 18. [Glosarium](#18-glosarium)
 19. [Sumber](#19-sumber)
@@ -728,6 +728,7 @@ lalu alasan memakai Monad dan roadmap. Di akhir, sebut link repo, alamat kontrak
 | Kenapa Monad, bukan chain lain? | Logikanya bisa jalan di EVM mana pun. Tapi Pusaka membuat pihak lain menanggung biaya atas nama keluarga (relayer kabar hidup dan saksi, gas amplop, penyapuan rekening virtual), jadi butuh biaya hampir nol dan finalitas cepat: di Monad satu transaksi ±Rp2,40 (60 rb gas × 102 gwei, MON ≈ Rp392) dan final dalam 0,6 detik. EIP-7702 aktif di Monad sejak Oktober 2025, dan precompile P-256 membuat kabar hidup dengan sidik jari (passkey) murah: ±77 rb gas, sedangkan tanpa precompile ±365 rb. |
 | Berapa biaya setahun untuk pewaris? | Nol. Transaksi biasanya sudah menjadi bukti hidup. Jika dompetnya diam, satu kabar hidup setahun (batas gas 80 rb ≈ Rp3) dibayar relayer. Bandingkan dengan tombol tiap 8 menit: ±65.700 transaksi, ±Rp158 ribu per tahun. |
 | Faraid itu rumit. Bagaimana dengan saudara atau cucu? | MVP mendukung ahli waris inti sesuai KHI Pasal 174 ayat (2): anak, ayah, ibu, janda/duda. Kasus lain ditolak dengan jelas, tidak dibagi dengan salah. |
+| Pusaka dapat uang dari mana? Warisannya dipotong? | Tidak dipotong: kontrak membagi 100% sesuai faraid. Pendapatan dari biaya pencairan ke bank (flat, seperti biaya transfer, dibagi dengan mitra berizin) dan dari lisensi ke exchange atau dompet yang ingin menawarkan "warisan sesuai faraid" ke penggunanya. Fitur tambahan untuk pewaris bisa berlangganan, dibayar semasa hidup. Rincian di bagian 16.1. |
 | Bagaimana jika ahli waris sepakat membagi dengan cara lain? | Perdamaian ahli waris (*islah*) ada di roadmap: semua ahli waris menandatangani pembagian yang berbeda. |
 
 ---
@@ -795,7 +796,27 @@ lalu alasan memakai Monad dan roadmap. Di akhir, sebut link repo, alamat kontrak
 | 1 (bulan 1) | Konfirmasi saksi dengan passkey (kabar hidup pewaris sudah memakai passkey); pengingat lewat WhatsApp; kerja sama mitra pencairan berizin (redeem stablecoin rupiah ke BI-FAST) |
 | 2 (bulan 2–3) | Validasi dengan ahli faraid, hakim Pengadilan Agama, dan notaris; dukungan saudara, kakek/nenek, dan ahli waris pengganti (Pasal 185); utang dan biaya jenazah; banyak jenis aset (ERC-20, NFT) |
 | 3 (2027) | Mainnet dengan stablecoin rupiah setelah aturan stablecoin OJK terbit (diperkirakan Januari 2027); kerja sama dengan exchange/dompet sebagai "tombol warisan"; audit keamanan |
-| Model bisnis | Gratis untuk pengguna; biaya kecil saat pembagian (mis. 0,5%) atau lisensi B2B untuk exchange dan dompet |
+
+### 16.1 Model bisnis
+
+**Prinsipnya: warisan tidak dipotong.** Kontrak membagi 100% harta sesuai urutan KHI (harta bersama → wasiat →
+faraid). Pusaka tidak dibayar dari kematian, tetapi dari layanan yang dipakai keluarga dan dari mitra.
+
+| Sumber | Cara kerja | Kenapa masuk akal |
+|---|---|---|
+| **Biaya pencairan (utama)** | Tiap transfer rupiah ke rekening ahli waris atau pencairan amplop kena biaya flat (patokan: redeem IDRX Rp5.000 per transfer). Mitra pencairan berizin menagihnya; Pusaka mendapat bagi hasil per transfer. | Dibayar untuk jasa transfer, seperti biaya antarbank. Tidak mengubah bagian faraid. Langsung terlihat di demo (`MitraCair`). |
+| **Lisensi B2B** | Exchange dan dompet di Indonesia memasang Pusaka sebagai fitur "Warisan sesuai faraid". Biaya integrasi plus biaya per pengguna aktif per tahun. | Exchange tidak punya solusi warisan untuk penggunanya. Pusaka mendapat pengguna dari mereka, jadi biaya akuisisi rendah. |
+| **Langganan pewaris (opsional)** | Biaya kecil per tahun untuk fitur tambahan: pengingat WhatsApp, dokumen pendukung penetapan ahli waris, lebih dari satu jenis aset. Fitur dasar tetap gratis. | Dibayar semasa hidup dengan akad ijarah (sewa jasa) yang jelas; harta warisan tidak disentuh. |
+| **Kemitraan lembaga (roadmap)** | Notaris, lembaga zakat dan wakaf, bank syariah: rujukan, layanan dokumen, penyaluran wasiat dan wakaf. | Memperluas jangkauan ke keluarga yang mengurus warisan secara formal. |
+
+**Kenapa tidak memotong persentase dari warisan.** Dalam urutan fikih, harta waris dipakai untuk biaya jenazah, lalu
+utang, lalu wasiat, baru dibagi faraid. Potongan dari penyedia layanan hanya sah jika sudah disepakati pewaris semasa
+hidup sebagai upah (dihitung seperti utang), dan tetap terdengar seperti "untung dari orang meninggal". Biaya
+pencairan dan lisensi menghindari keduanya.
+
+**Hitungan kasar.** Satu keluarga contoh di demo punya 4 penerima lewat bank dan 1 amplop, jadi 5 pencairan × Rp5.000 =
+Rp25.000 per warisan yang dibagikan. Angka utamanya datang dari lisensi: pengguna exchange yang memasang Pusaka membayar
+lewat exchange, bukan saat wafat.
 
 ---
 

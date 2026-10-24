@@ -11,7 +11,7 @@
 
 Ahli waris tidak perlu dompet kripto. Pewaris tidak perlu menekan tombol apa pun.
 
-[**Demo live**](https://pusaka-faraid.vercel.app) ·
+[**Demo live**](https://pusakafaraid.xyz) ·
 [Kontrak](#kontrak-yang-di-deploy) ·
 [Mulai cepat](#mulai-cepat) ·
 [Dokumen](#dokumen)
@@ -88,7 +88,7 @@ Monad testnet, chain id `10143`. Source terverifikasi di Sourcify (exact match).
 
 | | |
 |---|---|
-| Aplikasi live | https://pusaka-faraid.vercel.app |
+| Aplikasi live | https://pusakafaraid.xyz (cadangan: https://pusaka-faraid.vercel.app) |
 | Repo | https://github.com/astrorehan/pusaka |
 | Catatan deploy | [`contracts/broadcast/Deploy.s.sol/10143/run-latest.json`](contracts/broadcast/Deploy.s.sol/10143/run-latest.json) |
 

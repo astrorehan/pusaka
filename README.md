@@ -11,7 +11,7 @@
 
 Heirs don't need a wallet. The owner never has to press a button.
 
-[**Live demo**](https://pusaka-faraid.vercel.app) ·
+[**Live demo**](https://pusakafaraid.xyz) ·
 [Contracts](#deployed-contracts) ·
 [Quick start](#quick-start) ·
 [Docs](#documentation)
@@ -62,6 +62,8 @@ flowchart LR
 
 No wallet or install needed. Everything runs on Monad testnet with play-money rupiah (tIDR).
 
+Live at **[pusakafaraid.xyz](https://pusakafaraid.xyz)**. Backup URL: [pusaka-faraid.vercel.app](https://pusaka-faraid.vercel.app). The links below use the backup URL; both serve the same app.
+
 1. Open **[pusaka-faraid.vercel.app/pewaris](https://pusaka-faraid.vercel.app/pewaris)** (owner screen). Keep the
    sample family, choose how each heir receives, and sign. The demo wallet gets testnet gas automatically.
 2. Open **[/saksi](https://pusaka-faraid.vercel.app/saksi)** (witnesses). Hold the button on two witness cards. The
@@ -99,7 +101,7 @@ demo runs on testnet so visitors can use it with play money.
 
 | | |
 |---|---|
-| Live app | https://pusaka-faraid.vercel.app |
+| Live app | https://pusakafaraid.xyz (backup: https://pusaka-faraid.vercel.app) |
 | Repository | https://github.com/astrorehan/pusaka |
 | Deploy record | [testnet](contracts/broadcast/Deploy.s.sol/10143/run-latest.json) · [mainnet](contracts/broadcast/Deploy.s.sol/143/run-latest.json) |
 

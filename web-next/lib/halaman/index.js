@@ -36,14 +36,14 @@ UI.blok(document.getElementById('jaringan'));
 /* ---------- daftar layar ---------- */
 const PANAH = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 8h11M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.3"/></svg>';
 document.getElementById('daftarLayar').innerHTML = [
-  ['pewaris.html', 'Pewaris', 'Laptop', 'Memasang aturan dan memilih cara terima tiap ahli waris.'],
-  ['kabar.html', 'HP pewaris', 'HP atau laptop', 'Bukti hidup tanpa tombol: aktivitas dompet dan pengingat.'],
-  ['saksi.html', 'Saksi', 'Laptop', 'Tiga saksi menandatangani konfirmasi wafat, tanpa biaya.'],
-  ['panggung.html', 'Panggung', 'Proyektor', 'Kain besar untuk ditonton seisi ruangan.'],
-  ['waris.html', 'Ahli waris', 'HP penonton', 'Bagian tiap orang: ke rekening bank, amplop digital, atau dompet kripto.'],
-  ['mitra.html', 'Mitra pencairan', 'Laptop', 'Simulasi bank: tIDR menjadi rupiah di rekening.'],
-  ['hp.html', 'Simulasi HP', 'Laptop', 'HP pewaris dan HP ahli waris berdampingan.'],
-  ['kalkulator.html', 'Kalkulator', 'HP atau laptop', 'Hitung bagian untuk keluarga sendiri.'],
+  ['/pewaris', 'Pewaris', 'Laptop', 'Memasang aturan dan memilih cara terima tiap ahli waris.'],
+  ['/kabar', 'HP pewaris', 'HP atau laptop', 'Bukti hidup tanpa tombol: aktivitas dompet dan pengingat.'],
+  ['/saksi', 'Saksi', 'Laptop', 'Tiga saksi menandatangani konfirmasi wafat, tanpa biaya.'],
+  ['/panggung', 'Panggung', 'Proyektor', 'Kain besar untuk ditonton seisi ruangan.'],
+  ['/waris', 'Ahli waris', 'HP penonton', 'Bagian tiap orang: ke rekening bank, amplop digital, atau dompet kripto.'],
+  ['/mitra', 'Mitra pencairan', 'Laptop', 'Simulasi bank: tIDR menjadi rupiah di rekening.'],
+  ['/hp', 'Simulasi HP', 'Laptop', 'HP pewaris dan HP ahli waris berdampingan.'],
+  ['/kalkulator', 'Kalkulator', 'HP atau laptop', 'Hitung bagian untuk keluarga sendiri.'],
 ].map(([h, n, a, t]) => `<li><a href="${h}"><b>${n}</b><span class="alat">${a}</span><span class="isi-l">${t}</span>${PANAH}</a></li>`).join('');
 
 // "Mulai demo" langsung membuka layar Pewaris. Pewaris baru dibuat dari panel demo.

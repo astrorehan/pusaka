@@ -16,7 +16,7 @@ export default function Page() {
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:image" content="https://astrorehan.github.io/pusaka/og.png" />
     <header className="atas">
-      <a className="merek" href="index.html" aria-label="Pusaka, beranda">
+      <a className="merek" href="/" aria-label="Pusaka, beranda">
         <span id="logo" />
         <b>
           Pusaka
@@ -26,7 +26,7 @@ export default function Page() {
         </span>
       </a>
       <nav>
-        <a href="kalkulator.html">
+        <a href="/kalkulator">
           Kalkulator faraid
         </a>
         {' '}
@@ -54,11 +54,11 @@ export default function Page() {
             Aturan warisan dipasang di dompetmu sendiri. Setelah dua dari tiga saksi mengonfirmasi wafat dan masa sanggah lewat, bagian tiap ahli waris masuk ke rekening banknya, atau ke amplop digital yang dicairkan dari HP. Ahli waris tidak perlu dompet kripto, dan kamu tidak perlu menekan tombol apa pun untuk membuktikan masih hidup.
           </p>
           <div className="tombol resap" style={{ "--i": "3" }}>
-            <a className="btn" href="pewaris.html" id="mulai">
+            <a className="btn" href="/pewaris" id="mulai">
               Mulai demo
             </a>
             {' '}
-            <a className="btn btn--garis" href="kalkulator.html">
+            <a className="btn btn--garis" href="/kalkulator">
               Buka kalkulator faraid
             </a>
           </div>
@@ -360,7 +360,7 @@ export default function Page() {
               Demo publik
             </a>
             {' '}
-            <a className="btn btn--garis btn--kecil" href="kalkulator.html">
+            <a className="btn btn--garis btn--kecil" href="/kalkulator">
               Kalkulator faraid
             </a>
           </div>

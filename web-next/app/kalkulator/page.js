@@ -11,7 +11,7 @@ export default function Page() {
       <script dangerouslySetInnerHTML={{ __html: "\n  /* tema dipilih sebelum gambar pertama agar tidak berkedip */\n  (() => {\n    let t = null;\n    try { t = localStorage.getItem('pusaka-tema'); } catch {}\n    if (!t) t = matchMedia('(prefers-color-scheme: light)').matches ? 'terang' : 'gelap';\n    if (t === 'terang') document.documentElement.dataset.tema = 'terang';\n  })();\n" }} />
     <header className="atas">
       <div className="konteks">
-        <a className="merek" href="index.html" aria-label="Pusaka, beranda">
+        <a className="merek" href="/" aria-label="Pusaka, beranda">
           <span id="logo" />
           <b>
             Pusaka

@@ -10,7 +10,7 @@ export default function Page() {
       <meta name="theme-color" content="#131b33" />
     <main>
       <header className="atas">
-        <a className="merek" href="index.html" aria-label="Pusaka, beranda">
+        <a className="merek" href="/" aria-label="Pusaka, beranda">
           <span id="logo" />
           <b>
             Pusaka

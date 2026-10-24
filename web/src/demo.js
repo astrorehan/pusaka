@@ -828,9 +828,11 @@ function amplopUntuk(id) {
   return cacheAmplop.get(k);
 }
 /* Tautan untuk QR Panggung atau pesan WhatsApp. Benih di bagian # tidak pernah dikirim ke server. */
+/* Alamat layar: "pewaris.html" di versi Vite (bisa di subfolder, mis. GitHub Pages), "/pewaris" di versi Next. */
+export const alamatLayar = (h) => (env.URL_BERSIH ? (h === 'index' ? '/' : `/${h}`) : `${h}.html`);
 function urlAmplop(id) {
   const base = (env.VITE_PUBLIC_URL || location.origin).replace(/\/$/, '');
-  return `${base}/waris.html?p=${P}${id ? `&id=${id}` : ''}${benih ? `#s=${benih}` : ''}`;
+  return `${base}/${alamatLayar('waris').replace(/^\//, '')}?p=${P}${id ? `&id=${id}` : ''}${benih ? `#s=${benih}` : ''}`;
 }
 /* Cara terima satu penerima, untuk layar mana pun. Di laptop pewaris: dari aturan. Di perangkat lain: rekening
    virtual terbaca dari mitra; selain itu amplop atau kripto menurut keluarga contoh. */
@@ -857,7 +859,7 @@ function caraTerima(id) {
    secara berkala, satu tab sebagai pemimpin. Server mengerjakan:
    1. Rekening virtual yang berisi disapu ke mitra (sapuBanyak).
    2. Pencairan yang diproses "ditransfer lewat BI-FAST" ±1,4 detik, lalu dicatat selesai dengan nomor referensi. */
-const HALAMAN_OPERATOR = /(panggung|pewaris|saksi|mitra|hp|index)\.html$|\/$/;
+const HALAMAN_OPERATOR = /(panggung|pewaris|saksi|mitra|hp|index)(\.html)?$|\/$/;
 const bolehOperator = () => !!operator && window.self === window.top && HALAMAN_OPERATOR.test(location.pathname);
 const ID_TAB = Math.random().toString(36).slice(2);
 const KUNCI_PEMIMPIN = 'pusaka-mitra-pemimpin';
@@ -1024,8 +1026,8 @@ function peringatan(teks) {
 }
 
 /* ---------- panel demo ---------- */
-const HALAMAN = [['index.html', 'Beranda'], ['pewaris.html', 'Pewaris'], ['saksi.html', 'Saksi'], ['waris.html', 'Ahli waris'],
-  ['hp.html', 'Simulasi HP'], ['kabar.html', 'HP pewaris'], ['panggung.html', 'Panggung'], ['mitra.html', 'Mitra bank'], ['kalkulator.html', 'Kalkulator']];
+const HALAMAN = [['index', 'Beranda'], ['pewaris', 'Pewaris'], ['saksi', 'Saksi'], ['waris', 'Ahli waris'],
+  ['hp', 'Simulasi HP'], ['kabar', 'HP pewaris'], ['panggung', 'Panggung'], ['mitra', 'Mitra bank'], ['kalkulator', 'Kalkulator']];
 function panel({ judul = 'Panel demo', aksiStatus = true } = {}) {
   const d = document.createElement('details');
   if (window.self !== window.top) return d; // di dalam iframe (simulasi HP), panel ada di halaman induk
@@ -1040,7 +1042,7 @@ function panel({ judul = 'Panel demo', aksiStatus = true } = {}) {
       ${LOKAL ? '<button data-a="lewati">Majukan waktu</button>' : ''}
       <button data-a="bagikan">Bagikan</button><button data-a="prosesMitra">Proses mitra</button><button data-a="ulang">Pewaris baru</button></div>` : ''}
     <div class="baris"><span class="judul">Layar</span>
-      ${HALAMAN.map(([h, l]) => `<a href="${h}" style="padding:6px 4px">${l}</a>`).join('')}</div>
+      ${HALAMAN.map(([h, l]) => `<a href="${alamatLayar(h)}" style="padding:6px 4px">${l}</a>`).join('')}</div>
     <div class="baris"><span class="judul">Pewaris</span><span style="font-size:12px;opacity:.75;word-break:break-all">${P}</span></div>
   </div>`;
   d.addEventListener('click', (e) => {

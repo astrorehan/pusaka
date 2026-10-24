@@ -14,8 +14,8 @@ function label(id) {
   return `${D.PERAN_PANJANG[id] || id}${c && CARA[c.cara] ? ` · ${CARA[c.cara]}` : ''}`;
 }
 const urlHP = (id) => (id === 'kabar'
-  ? `kabar.html${diam ? `?${diam}` : ''}`
-  : `waris.html?id=${id}${diam ? `&${diam}` : ''}`);
+  ? `/kabar${diam ? `?${diam}` : ''}`
+  : `/waris?id=${id}${diam ? `&${diam}` : ''}`);
 
 let simpan = [];
 try { const j = JSON.parse(localStorage.getItem(KUNCI)); if (Array.isArray(j)) simpan = j; } catch {}

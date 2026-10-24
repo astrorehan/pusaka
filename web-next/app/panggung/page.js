@@ -11,7 +11,7 @@ export default function Page() {
     <div className="wadah-panggung">
       <div className="artboard" id="ab">
         <header className="pg-atas">
-          <a className="merek" href="index.html" aria-label="Pusaka">
+          <a className="merek" href="/" aria-label="Pusaka">
             <svg className="logo" viewBox="6.6 6.6 18.8 18.8" aria-hidden="true">
               <path className="logo-k" d="M24.415 7.585A5.2 3.4 -45 0 0 17.061 14.939A5.2 3.4 -45 0 0 24.415 7.585ZM7.585 7.585A5.2 3.4 45 0 1 14.939 14.939A5.2 3.4 45 0 1 7.585 7.585ZM7.585 24.415A5.2 3.4 -45 0 0 14.939 17.061A5.2 3.4 -45 0 0 7.585 24.415ZM24.415 24.415A5.2 3.4 45 0 1 17.061 17.061A5.2 3.4 45 0 1 24.415 24.415Z" />
               <circle className="logo-titik" cx="16" cy="16" r="1.2" />

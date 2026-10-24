@@ -64,20 +64,21 @@ const config = {
   experimental: { externalDir: true },
   outputFileTracingRoot: akar,
 
-  /* Alamat lama (*.html) tetap hidup: dipetakan ke route. Alamat kanonik tetap *.html karena kode bersama
-     (web/src/demo.js: operator mitra, QR, panel demo) mencocokkan location.pathname dengan "….html". */
+  /* Alamat utama tanpa .html (/pewaris, /panggung, ...). Alamat lama (*.html, mis. QR atau tautan lama dari
+     GitHub Pages) dialihkan ke sana. */
   async rewrites() {
     return {
       beforeFiles: [
-        { source: '/index.html', destination: '/' },
-        ...HALAMAN.map((h) => ({ source: `/${h}.html`, destination: `/${h}` })),
         // RPC anvil lewat server yang sama (HP di Wi-Fi yang sama tidak perlu akses langsung ke anvil)
         { source: '/rpc', destination: anvil },
       ],
     };
   },
   async redirects() {
-    return HALAMAN.map((h) => ({ source: `/${h}`, destination: `/${h}.html`, permanent: false }));
+    return [
+      { source: '/index.html', destination: '/', permanent: false },
+      ...HALAMAN.map((h) => ({ source: `/${h}.html`, destination: `/${h}`, permanent: false })),
+    ];
   },
 
   webpack(cfg) {

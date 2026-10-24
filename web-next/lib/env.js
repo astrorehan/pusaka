@@ -15,6 +15,8 @@ export const env = {
   MODE: process.env.NODE_ENV,
   DEV: process.env.NODE_ENV !== 'production',
   PROD: process.env.NODE_ENV === 'production',
+  // Alamat layar tanpa .html (/pewaris, /panggung, ...)
+  URL_BERSIH: true,
   BASE_URL: '/',
   SSR: false,
 };

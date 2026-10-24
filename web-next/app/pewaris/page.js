@@ -324,8 +324,8 @@ export default function Page() {
                     </small>
                   </span>
                   <select className="pilih" id="selSanggah" aria-label="Masa sanggah">
-                    <option value="20">
-                      20 detik (demo)
+                    <option value="10">
+                      10 detik (demo)
                     </option>
                     <option value="604800">
                       7 hari

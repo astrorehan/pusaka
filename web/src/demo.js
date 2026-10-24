@@ -119,7 +119,7 @@ const akhiranDari = (nomor) => String(nomor || '').replace(/\D/g, '').slice(-4);
 /* ---------- status ---------- */
 const awal = () => ({
   v: 4, status: 0, alasan: null, attest: [null, null, null], bukti: [null, null, null],
-  triggeredAt: null, sanggah: 20, batas: 31536000, ambang: 2,
+  triggeredAt: null, sanggah: 10, batas: 31536000, ambang: 2,
   setupAt: null, lastBeat: Date.now(), lastVia: 0, round: 0, distributedAt: null, qr: false, rev: 1,
   gas: { pewaris: 0, saksi: [0, 0, 0], induk: 0, operator: 0 }, tidr: 0, log: [],
   penerima: Object.fromEntries(ID_PENERIMA.map((id) => [id, { id, key: KEY_PENERIMA[id], cara: TERIMA_AWAL()[KEY_PENERIMA[id]].cara, alamat: null, bank: '', akhiran: '', saldo: 0, cair: null }])),
@@ -159,7 +159,7 @@ function catatLog(teks, tx = '') {
 const ATURAN_KEY = 'pusaka-aturan-v2';
 const AWAL_ATURAN = () => ({
   laki: true, istri: 1, suami: false, putra: 2, putri: 1, ayah: true, ibu: true, saudara: 0, kerabatLain: false,
-  bersama: 'seluruh', ambang: 2, batas: 31536000, sanggah: 20,
+  bersama: 'seluruh', ambang: 2, batas: 31536000, sanggah: 10,
   wasiat: [{ label: 'Wakaf masjid', bagian: '1/5' }],
   saksi: [{ nama: 'Rina Santoso', peran: 'Adik' }, { nama: 'Yusuf Pratama', peran: 'Sahabat' }, { nama: 'Ustaz Hamid', peran: 'Guru ngaji' }],
   terima: TERIMA_AWAL(),
@@ -169,6 +169,8 @@ function bacaAturan() {
   try { f = JSON.parse(localStorage.getItem(ATURAN_KEY)); } catch { f = null; }
   f = f || AWAL_ATURAN();
   if (!f.terima) f.terima = TERIMA_AWAL();
+  // Masa sanggah demo dulu 20 detik, sekarang 10 detik: aturan lama yang tersimpan di browser ikut diperbarui.
+  if (Number(f.sanggah) === 20) f.sanggah = 10;
   return f;
 }
 function simpanAturan(f) {

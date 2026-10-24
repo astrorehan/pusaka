@@ -5,3 +5,7 @@ broadcast/*/31337/
 
 # Rahasia
 .env
+
+# Catatan forge script selain run-latest
+broadcast/**/run-[0-9]*.json
+broadcast/**/*.lock

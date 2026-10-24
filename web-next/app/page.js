@@ -438,7 +438,7 @@ export default function Page() {
           Prototipe di Monad testnet dengan rupiah mainan (tIDR). Transfer bank disimulasikan. Kunci demo hanya untuk testnet, jangan pernah memakai private key dompet asli. Bukan nasihat hukum atau fatwa.
         </p>
         <span className="t-micro">
-          Monad Blitz Jogja Vol. 2
+          Monad Blitz Vol. 2
         </span>
       </footer>
     </main>

@@ -1,4 +1,4 @@
-# Penilaian Monad Blitz Jogja Vol. 2
+# Penilaian Monad Blitz Vol. 2
 
 Sumber: slide panitia, Sabtu 24 Oktober 2026 pagi.
 
@@ -60,6 +60,6 @@ Saat pitch, **sebutkan dengan jelas** link repo, alamat kontrak, URL live, dan d
 
 ## Catatan untuk Pusaka
 
-- Kunci dompet induk (`VITE_INDUK_KEY`) ikut terbawa ke browser. Versi yang di-hosting publik harus memakai kunci terpisah dengan saldo kecil.
+- Kunci dompet induk hanya ada di server (relayer `/api/induk`), tidak pernah dikirim ke browser. Versi publik tetap memakai dompet induk terpisah dengan saldo kecil.
 - Kontrak di-deploy dan diverifikasi di explorer hari ini.
 - Fitur Monad yang sudah dipakai dan bisa ditonjolkan: kontrak lebih besar dari 24 KB (PusakaWallet sekitar 28 KB), precompile P-256 untuk sidik jari, EIP-7702, dan konfirmasi transaksi 1–2 detik.

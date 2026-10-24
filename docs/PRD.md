@@ -5,7 +5,7 @@
 | | |
 |---|---|
 | **Tanggal** | 24 Oktober 2026 |
-| **Acara** | Monad Blitz Jogja Vol. 2 · Sabtu, 24 Oktober 2026 · GIK UGM |
+| **Acara** | Monad Blitz Vol. 2 · Sabtu, 24 Oktober 2026 |
 | **Tim** | Solo |
 | **Status** | Kontrak dan web jalan ujung ke ujung di anvil dan di Monad testnet (`web/scripts/e2e.mjs` lulus). Deploy resmi, verifikasi kontrak, dan hosting publik dikerjakan hari ini |
 | **Dokumen pendamping** | [`faraid-spec.md`](faraid-spec.md): aturan faraid, algoritma, dan 24 kasus uji · [`arsitektur.md`](arsitektur.md): cara kerja kontrak · [`penilaian.md`](penilaian.md): penilaian panitia |
@@ -225,7 +225,7 @@ Blitz Jakarta). Pencarian umum juga tidak menemukan produk warisan kripto berbas
 | **Mitra pencairan** | Penukar stablecoin rupiah berizin (di demo: simulasi) | Menukar token ke rupiah dengan aman | Menyapu rekening virtual, mentransfer lewat BI-FAST, mencatat bukti |
 | **Relayer Pusaka** | Layanan Pusaka | Pewaris dan saksi tidak perlu gas | Mengirim tanda tangan kabar hidup dan konfirmasi saksi, mensponsori gas amplop |
 | **Siapa pun** | Ahli waris, saksi, atau orang lain | Proses tidak macet jika satu pihak diam | Memicu karena tidak aktif; menjalankan pembagian setelah masa sanggah |
-| **Juri & penonton** (demo) | Juri Monad Foundation dan Dev Web3 Jogja, peserta | Paham dalam 3 menit dan bisa ikut mencoba | Memindai QR dan melihat bagian masuk di HP |
+| **Juri & penonton** (demo) | Juri Monad Foundation dan komunitas, peserta | Paham dalam 3 menit dan bisa ikut mencoba | Memindai QR dan melihat bagian masuk di HP |
 
 ---
 
@@ -740,7 +740,7 @@ lalu alasan memakai Monad dan roadmap. Di akhir, sebut link repo, alamat kontrak
 | Sumber | Aturan |
 |---|---|
 | Halaman Luma Vol. 2 | Belajar, build, dan deploy app di hari yang sama. Tim maksimal 3 orang. Boleh pakai AI. Pendaftaran butuh persetujuan host. |
-| Aturan Blitz (info pack Ankara, Monad Foundation) | Riset dan brainstorming dianjurkan, tetapi kode ditulis di acara. Tidak boleh proyek lama atau fork (kecuali library dan boilerplate standar). Repo GitHub publik. Deploy di Monad testnet. |
+| Aturan Blitz (info pack, Monad Foundation) | Riset dan brainstorming dianjurkan, tetapi kode ditulis di acara. Tidak boleh proyek lama atau fork (kecuali library dan boilerplate standar). Repo GitHub publik. Deploy di Monad testnet. |
 | Penilaian panitia (slide Sabtu 24 Oktober 2026 pagi; lengkapnya di [`penilaian.md`](penilaian.md)) | **Pengumpulan ditutup 16.45 WIB**; yang sudah terkumpul saat itu yang dinilai. Demo 3 menit di panggung, **tanpa slide**, fokus ke demo live dan inovasi utama. Urutan pitch mengikuti urutan submit. Tidak ada voting peserta. Total 400 poin: Basic 100, Advance (apakah jalan) 100, Advance (build in public) 100, Bonus 100. |
 
 ### 14.2 Checklist pengumpulan (batas 16.45 WIB)
@@ -886,10 +886,8 @@ lewat exchange, bukan saat wafat.
 ## 19. Sumber
 
 **Acara dan aturan**
-- Luma, Monad Blitz Jogja Vol. 2: https://luma.com/blitz-jogja-okt-2026
-- Info pack Monad Blitz Ankara (aturan Blitz): https://monad-foundation.notion.site/Monad-Blitz-Ankara-Info-Pack-2726367594f280199841cab7df002fef
+- Info pack Monad Blitz (aturan Blitz): https://monad-foundation.notion.site/Monad-Blitz-Ankara-Info-Pack-2726367594f280199841cab7df002fef
 - Blitz Portal API (daftar proyek semua edisi): https://blitz.devnads.com/api/showcase?limit=100&offset=0
-- UGM, juara Monad Blitz Jogja Vol. 1: https://jteti.ugm.ac.id/2026/05/06/mahasiswa-dteti-dominasi-monad-blitz-hackathon-2026-melalui-ugm-blockchain-club/
 - Repo PassChick (riwayat commit): https://github.com/wngstnr-code/pass-chick
 
 **Masalah**

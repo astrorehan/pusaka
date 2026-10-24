@@ -16,6 +16,7 @@ Dibuat di **Monad Blitz Jogja Vol. 2**, Sabtu 24 Oktober 2026, GIK UGM.
 
 | | |
 |---|---|
+| Repo | https://github.com/astrorehan/pusaka |
 | Demo live | _menyusul_ |
 | Jaringan | Monad testnet (chain id 10143) · source terverifikasi di Sourcify |
 | `PusakaWallet` | [`0xeea3b2c6040B0eACb3E451A6f13bA11db547e096`](https://testnet.monadvision.com/address/0xeea3b2c6040B0eACb3E451A6f13bA11db547e096) |
@@ -38,8 +39,8 @@ Dibuat di **Monad Blitz Jogja Vol. 2**, Sabtu 24 Oktober 2026, GIK UGM.
 Butuh [Foundry](https://getfoundry.sh) dan Node.js 20+.
 
 ```bash
-git clone --recurse-submodules <url repo>
-cd pusaka-blitz/contracts && forge test     # semua tes kontrak
+git clone --recurse-submodules https://github.com/astrorehan/pusaka
+cd pusaka/contracts && forge test     # semua tes kontrak
 ```
 
 Menjalankan web di blockchain lokal (anvil) atau di Monad testnet dijelaskan di [`web/README.md`](web/README.md).

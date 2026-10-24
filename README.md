@@ -17,7 +17,7 @@ Dibuat di **Monad Blitz Jogja Vol. 2**, Sabtu 24 Oktober 2026, GIK UGM.
 | | |
 |---|---|
 | Repo | https://github.com/astrorehan/pusaka |
-| Demo live | https://astrorehan.github.io/pusaka/ (mulai dari [Panggung](https://astrorehan.github.io/pusaka/panggung.html) atau [Pewaris](https://astrorehan.github.io/pusaka/pewaris.html)) |
+| Demo live | https://pusaka-faraid.vercel.app (mulai dari [Panggung](https://pusaka-faraid.vercel.app/panggung.html) atau [Pewaris](https://pusaka-faraid.vercel.app/pewaris.html)) · Next.js di Vercel, dompet induk hanya di server |
 | Jaringan | Monad testnet (chain id 10143) · source terverifikasi di Sourcify |
 | `PusakaWallet` | [`0xeea3b2c6040B0eACb3E451A6f13bA11db547e096`](https://testnet.monadvision.com/address/0xeea3b2c6040B0eACb3E451A6f13bA11db547e096) |
 | `MitraCair` | [`0x04405E9Fd9ed041F81086259Bf200990B9EC315F`](https://testnet.monadvision.com/address/0x04405E9Fd9ed041F81086259Bf200990B9EC315F) |
@@ -33,6 +33,7 @@ Dibuat di **Monad Blitz Jogja Vol. 2**, Sabtu 24 Oktober 2026, GIK UGM.
 | [`docs/penilaian.md`](docs/penilaian.md) | Kriteria penilaian Monad Blitz Jogja Vol. 2 |
 | [`contracts/`](contracts/README.md) | Kontrak Solidity (Foundry) |
 | [`web/`](web/README.md) | Aplikasi web (Vite + viem + GSAP): 9 layar yang tersambung ke kontrak |
+| [`web-next/`](web-next/README.md) | Versi Next.js (App Router + React) dari 9 layar yang sama, dengan relayer di route `/api/induk`. Ini yang online di Vercel |
 | [`relayer/`](docs/relayer-api.md) + `api/` | Relayer di server: dompet induk dan operator mitra (browser tidak memegang kuncinya). Fungsi Vercel `api/induk.js` |
 
 ## Menjalankan

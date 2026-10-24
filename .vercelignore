@@ -1,0 +1,9 @@
+contracts
+docs/video
+**/node_modules
+web/dist
+web-next/.next
+.env*
+**/.env*
+!**/.env.example
+.claude

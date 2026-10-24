@@ -515,6 +515,19 @@ async function jalankan(nama, kerja) {
 }
 let pesanTerakhir = '';
 const hanyaBaca = () => { toast('Layar ini hanya memantau. Aksi pewaris ada di browser yang memegang kunci pewaris.'); return null; };
+/* Tombol ditekan saat belum waktunya: beri tahu alasannya, jangan diam saja (penting saat demo di panggung). */
+function belum(aksi) {
+  let t;
+  if (s.status === 0) t = aksi === 'pasang' ? '' : 'Aturan warisan belum dipasang. Pasang dulu di layar Pewaris.';
+  else if (s.status === 3) t = 'Warisan ini sudah dibagikan. Mulai pewaris baru (tombol R di Panggung).';
+  else if (aksi === 'pasang') t = 'Aturan sudah terpasang.';
+  else if (aksi === 'bagikan') t = s.status === 1 ? 'Belum bisa dibagikan: butuh konfirmasi 2 dari 3 saksi dulu.' : `Masa sanggah masih ${Math.ceil(sisaSanggah())} detik.`;
+  else if (aksi === 'saksi') t = s.status === 2 ? 'Saksi sudah cukup. Masa sanggah sedang berjalan.' : 'Saksi ini sudah menandatangani.';
+  else if (aksi === 'picu') t = 'Pemicu tidak aktif hanya untuk aturan yang aktif.';
+  else t = 'Masa sanggah sudah habis. Warisan tinggal dibagikan.';
+  if (t) toast(t);
+  return null;
+}
 
 /* Domain EIP-712 kontrak Pusaka di dompet pewaris, untuk kabar hidup dan konfirmasi saksi. */
 const domainPusaka = () => ({ name: 'Pusaka', version: '1', chainId: chain.id, verifyingContract: P });
@@ -545,7 +558,7 @@ const aksi = {
      onStatus menerima 'gas' | 'otorisasi' | 'kirim' untuk lembar tanda tangan. */
   async pasang({ aturan, onStatus = () => {} } = {}) {
     if (!milikSendiri()) return hanyaBaca();
-    if (s.status !== 0) return null;
+    if (s.status !== 0) return belum('pasang');
     const f = aturan || bacaAturan();
     return jalankan('pasang', async () => {
       const a = akun.pewaris;
@@ -585,7 +598,7 @@ const aksi = {
   },
   /* Saksi menandatangani konfirmasi (EIP-712), relayer mengirimnya. Saksi tidak butuh gas. */
   async saksi(i, bukti = AKTA_CONTOH) {
-    if (s.status !== 1 || s.attest[i]) return null;
+    if (s.status !== 1 || s.attest[i]) return belum('saksi');
     const w = akun.saksi[i];
     return jalankan('saksi', async () => {
       const r = relayer();
@@ -606,14 +619,14 @@ const aksi = {
   },
   /* triggerByInactivity(): siapa pun, setelah batas tidak aktif terlewati. Dikirim relayer. */
   async picu() {
-    if (s.status !== 1) return null;
+    if (s.status !== 1) return belum('picu');
     return jalankan('picu', () => relay('dipicu', 'triggerByInactivity', [], GAS.picu));
   },
   /* Kabar hidup: pewaris hanya menandatangani (tanpa gas), relayer mengirim checkIn(). Saat masa sanggah, ini
      membatalkan pemicu. Waktunya dibuat lebih baru dari bukti hidup terakhir (jam blok beresolusi 1 detik). */
   async kabar() {
     if (!milikSendiri()) return hanyaBaca();
-    if (!(s.status === 1 || (s.status === 2 && sisaSanggah() > 0))) return null;
+    if (!(s.status === 1 || (s.status === 2 && sisaSanggah() > 0))) return belum('kabar');
     const sebab = s.status === 2 ? 'batal' : 'kabar';
     return jalankan('kabar', async () => {
       const r = relayer();
@@ -670,7 +683,7 @@ const aksi = {
   /* Cadangan: heartbeat() lewat transaksi biasa dari dompet pewaris. */
   async hidup() {
     if (!milikSendiri()) return hanyaBaca();
-    if (!(s.status === 1 || (s.status === 2 && sisaSanggah() > 0))) return null;
+    if (!(s.status === 1 || (s.status === 2 && sisaSanggah() > 0))) return belum('hidup');
     const sebab = s.status === 2 ? 'batal' : 'hidup';
     return jalankan('hidup', () => kirim(akun.pewaris, { address: P, abi: pusakaWalletAbi, functionName: 'heartbeat', gas: GAS.hidup }, sebab));
   },
@@ -678,7 +691,7 @@ const aksi = {
      saat masa sanggah pemicu batal sendiri. Demo: saldo lalu diisi ulang ke Rp300 jt agar angka contoh tetap sama. */
   async bayar({ jumlah = 250_000, ke = WARUNG } = {}) {
     if (!milikSendiri()) return hanyaBaca();
-    if (!(s.status === 1 || s.status === 2)) return null;
+    if (!(s.status === 1 || s.status === 2)) return belum('bayar');
     const sebab = s.status === 2 && sisaSanggah() > 0 ? 'batal' : 'aktivitas';
     return jalankan('bayar', async () => {
       const data = encodeFunctionData({ abi: mockIDRAbi, functionName: 'transfer', args: [ke, parseEther(String(jumlah))] });
@@ -716,7 +729,7 @@ const aksi = {
     });
   },
   async bagikan() {
-    if (s.status !== 2 || sisaSanggah() > 0) return null;
+    if (s.status !== 2 || sisaSanggah() > 0) return belum('bagikan');
     const hasil = await jalankan('bagikan', async () => {
       const h = await relay('dibagikan', 'finalize', [], GAS.bagikan);
       blokDibagikan = h.blok;

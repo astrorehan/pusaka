@@ -1,0 +1,29 @@
+[profile.default]
+src = "src"
+out = "out"
+libs = ["lib"]
+solc_version = "0.8.30"
+evm_version = "prague"
+optimizer = true
+optimizer_runs = 200
+remappings = ["@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/"]
+
+[lint]
+# Sengaja diabaikan:
+# - block-timestamp: timer warisan berskala detik–bulan; manipulasi beberapa detik tidak berpengaruh
+# - require-revert-in-loop: validasi input di constructor memang memeriksa tiap ahli waris/saksi
+# - uninitialized-local: Solidity selalu mengisi variabel lokal dengan 0
+# - unsafe-typecast: uint64(block.timestamp) dan uint8(panjang daftar <= 20) tidak bisa terpotong
+# - reentrancy-events: event sudah dipancarkan sebelum transfer token; sisa peringatan berasal dari
+#   balanceOf() (hanya baca) dan pembuatan klon brankas
+# - calls-loop: pembagian memang mengirim token ke tiap penerima; transfer yang gagal dicatat (TransferFailed)
+#   dan tidak membatalkan transfer lain
+exclude_lints = ["block-timestamp", "require-revert-in-loop", "uninitialized-local", "unsafe-typecast", "reentrancy-events", "calls-loop"]
+
+[fuzz]
+runs = 1000
+
+[rpc_endpoints]
+monad_testnet = "https://testnet-rpc.monad.xyz"
+
+# See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options

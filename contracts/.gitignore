@@ -1,0 +1,7 @@
+# Hasil build Foundry
+out/
+cache/
+broadcast/*/31337/
+
+# Rahasia
+.env

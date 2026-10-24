@@ -460,6 +460,8 @@ function pesanDari(e) {
   const m = (e && (e.shortMessage || e.message)) || String(e);
   // e.message viem memuat baris "Details:" dari node, mis. "Signer had insufficient balance" di Monad.
   if (/insufficient funds|insufficient balance|exceeds the balance/i.test(`${m} ${e?.message || ''}`)) return 'Gas di dompet demo tidak cukup. Bagikan gas dulu.';
+  // RPC publik menolak karena terlalu banyak permintaan (429) atau sedang tidak terjangkau.
+  if (/429|too many requests|HTTP request failed|fetch failed|Failed to fetch/i.test(`${m} ${e?.message || ''}`)) return 'Jaringan Monad sedang sibuk. Tunggu sebentar, lalu coba lagi.';
   return m.split('\n')[0];
 }
 /* Kirim satu panggilan kontrak dari kunci di browser ini (pewaris atau amplop): simulasi dulu (agar penolakan terbaca

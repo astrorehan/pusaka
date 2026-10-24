@@ -1,18 +1,21 @@
 /* Koneksi ke blockchain: klien viem, alamat kontrak, dan kunci demo di browser (pewaris, saksi, amplop).
    Dompet induk dan operator mitra tidak ada di sini: kuncinya di server (relayer/), browser memanggil /api/induk. */
 import {
-  createPublicClient, createWalletClient, http, getAddress, keccak256, encodePacked, encodeAbiParameters, concat, toHex,
+  createPublicClient, createWalletClient, http, fallback, getAddress, keccak256, encodePacked, encodeAbiParameters, concat, toHex,
   getContractAddress,
 } from 'viem';
 import { privateKeyToAccount, generatePrivateKey } from 'viem/accounts';
 import { anvil, monadTestnet } from 'viem/chains';
 import { env } from './env.js';
+import { RPC_MONAD } from './rpc.js';
 
 export const LOKAL = (env.VITE_CHAIN || 'anvil') !== 'monad';
 export const chain = LOKAL ? anvil : monadTestnet;
 export const RPC = env.VITE_RPC || (LOKAL ? `${location.origin}/rpc` : monadTestnet.rpcUrls.default.http[0]);
 export const EXPLORER = LOKAL ? null : 'https://testnet.monadvision.com';
-const transport = http(RPC, { batch: LOKAL, retryCount: 2 });
+// Di testnet: RPC utama + RPC publik lain sebagai cadangan, supaya batas permintaan satu RPC tidak menggagalkan demo.
+const transport = LOKAL ? http(RPC, { batch: true, retryCount: 2 })
+  : fallback([...new Set([RPC, ...RPC_MONAD])].map((u) => http(u, { retryCount: 1, retryDelay: 250 })));
 
 export const pub = createPublicClient({ chain, transport, pollingInterval: LOKAL ? 250 : 200, batch: { multicall: !LOKAL } });
 /* Harga gas di Monad. Bawaan viem memakai harga maksimum ±2× base fee. Monad menolak transaksi jika saldo pengirim di

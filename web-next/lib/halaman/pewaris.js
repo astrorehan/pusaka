@@ -691,9 +691,11 @@ function renderBukti(paksa) {
         <p class="ket-aksi">Transaksi biasa dari dompetmu, misalnya membayar di warung. Transaksi apa pun otomatis jadi bukti hidup, tanpa langkah tambahan.</p>
         <button class="btn btn--garis btn--penuh" id="bKabar" type="button">Kirim kabar hidup</button>
         <p class="ket-aksi">Hanya tanda tangan. Pusaka yang mengirimnya, biaya untukmu Rp0.</p>
+        <a class="btn btn--garis btn--penuh" id="bHP" href="/kabar" target="_blank" rel="noopener">Buka HP pewaris</a>
+        <p class="ket-aksi">Layar HP Pak Budi: pengingat dari Pusaka, tombol "Saya masih hidup", dan sidik jari atau Face ID.</p>
       </div>
       <p class="pesan" id="bPesan"></p>
-      <button class="btn btn--teks btn--kecil cadangan" id="bCadangan" type="button" title="Transaksi heartbeat() biasa dari dompetmu">Tombol cadangan: Saya masih hidup</button>`;
+      <button class="btn btn--teks btn--kecil cadangan" id="bCadangan" type="button" title="heartbeat() langsung dari dompetmu, membayar gas sendiri. Tetap bisa dipakai walau server Pusaka mati.">Kirim langsung dari dompet (tanpa server Pusaka)</button>`;
     $('bBayar').onclick = (e) => aksiBukti(e.currentTarget, 'aktivitas', () => S.bayar());
     $('bKabar').onclick = (e) => aksiBukti(e.currentTarget, 'kabar', () => S.kabar());
     $('bCadangan').onclick = (e) => aksiBukti(e.currentTarget, 'hidup', () => S.hidup());

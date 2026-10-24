@@ -5,12 +5,13 @@
    Kunci induk dan operator tidak pernah keluar dari berkas ini. Konfigurasi dibaca dari variabel lingkungan server
    (INDUK_KEY, RPC_URL, TOKEN, WALLET, MITRA, GAS_MON, GAS_AMPLOP, CHAIN_ID). */
 import {
-  createPublicClient, createWalletClient, http, parseEther, getAddress, isAddress, keccak256, concat, toHex,
+  createPublicClient, createWalletClient, http, fallback, parseEther, getAddress, isAddress, keccak256, concat, toHex,
   BaseError, ContractFunctionRevertedError,
 } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
 import { anvil, monadTestnet } from 'viem/chains';
 import { pusakaWalletAbi, mockIDRAbi, mitraCairAbi } from '../web/src/abi.js';
+import { RPC_MONAD } from '../web/src/rpc.js';
 
 const RP300 = parseEther('300000000'); // Rp300 jt tIDR (18 desimal)
 const KUNCI_ANVIL_0 = '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80';
@@ -51,7 +52,9 @@ function muat() {
   const operator = privateKeyToAccount(keccak256(concat([kunci, toHex('pusaka-mitra-operator-v1')])));
   // Jumlah MON dibatasi supaya salah ketik di env tidak menguras dompet induk.
   const jumlah = (nama, awal, maks) => { const n = Number(e[nama] || awal); return n > 0 && n <= maks ? n : awal; };
-  const transport = http(RPC, { retryCount: 2 });
+  // Di testnet: RPC utama + RPC publik lain sebagai cadangan (lihat web/src/rpc.js).
+  const transport = LOKAL ? http(RPC, { retryCount: 2 })
+    : fallback([...new Set([RPC, ...RPC_MONAD])].map((u) => http(u, { retryCount: 1, retryDelay: 250 })));
   const pub = createPublicClient({ chain, transport, pollingInterval: LOKAL ? 250 : 200 });
   kfg = {
     LOKAL, chain, RPC, transport, pub, induk, operator,

@@ -205,16 +205,20 @@ body > .atas.lengket::before { opacity: 1; }
 /* ---------- Gerak: resapan teks ----------
    Teks muncul dari atas ke bawah dengan tepi lembut, seperti pewarna merambat di serat.
    Tambahkan .resap, lalu .is-in untuk memicu. --i mengatur urutan (stagger 90ms). */
-.resap {
-  -webkit-mask-image: linear-gradient(to bottom, #000 40%, transparent 60%);
-  mask-image: linear-gradient(to bottom, #000 40%, transparent 60%);
-  -webkit-mask-size: 100% 250%; mask-size: 100% 250%;
-  -webkit-mask-position: 0 100%; mask-position: 0 100%;
-}
-.resap.is-in { animation: resap var(--dur-4) var(--ease-resap) both; animation-delay: calc(var(--i, 0) * 90ms); }
+/* Mask hanya ada selama animasi. Tanpa animasi (mis. screenshot satu halaman penuh di Safari, mode hemat
+   baterai) teksnya tetap terlihat, tidak tertinggal tersembunyi. */
+.resap.is-in { animation: resap var(--dur-4) var(--ease-resap) backwards; animation-delay: calc(var(--i, 0) * 90ms); }
 @keyframes resap {
-  from { -webkit-mask-position: 0 100%; mask-position: 0 100%; transform: translateY(-.12em); }
-  to   { -webkit-mask-position: 0 0%;   mask-position: 0 0%;   transform: none; }
+  from {
+    -webkit-mask-image: linear-gradient(to bottom, #000 40%, transparent 60%); mask-image: linear-gradient(to bottom, #000 40%, transparent 60%);
+    -webkit-mask-size: 100% 250%; mask-size: 100% 250%;
+    -webkit-mask-position: 0 100%; mask-position: 0 100%; transform: translateY(-.12em);
+  }
+  to {
+    -webkit-mask-image: linear-gradient(to bottom, #000 40%, transparent 60%); mask-image: linear-gradient(to bottom, #000 40%, transparent 60%);
+    -webkit-mask-size: 100% 250%; mask-size: 100% 250%;
+    -webkit-mask-position: 0 0%; mask-position: 0 0%; transform: none;
+  }
 }
 
 /* ---------- Panel demo (khusus prototipe) ---------- */

@@ -2,13 +2,23 @@
 <html lang="id">
 <head>
 <meta charset="utf-8">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='4' fill='%23131b33'/%3E%3Crect x='4.5' y='4.5' width='15' height='15' fill='none' stroke='%23f5efe3' stroke-width='1.4'/%3E%3Cpath d='M8 19.5 12.4 4.5M12 19.5 16.3 4.5' stroke='%23f5efe3' stroke-width='1.4'/%3E%3C/svg%3E">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#131b33">
 <title>Pusaka — harta pusaka digital, dibagi sesuai faraid</title>
+<meta name="description" content="Warisan kripto dibagi sesuai faraid (KHI) di Monad. Aturan dipasang di dompetmu sendiri, bagian ahli waris masuk ke rekening bank tanpa dompet kripto.">
+<meta property="og:title" content="Pusaka — harta pusaka digital, dibagi sesuai faraid">
+<meta property="og:description" content="Aturan warisan dipasang di dompetmu sendiri. Ahli waris menerima bagiannya di rekening bank, tanpa dompet kripto. Berjalan di Monad testnet.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://astrorehan.github.io/pusaka/">
+<meta property="og:image" content="https://astrorehan.github.io/pusaka/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://astrorehan.github.io/pusaka/og.png">
 <link rel="stylesheet" href="assets/fonts.css">
 <link rel="stylesheet" href="assets/tokens.css">
 <link rel="stylesheet" href="assets/base.css">
+<script src="pembuka.js"></script>
 <style>
   main { padding: 0 var(--gutter) 64px; max-width: 1520px; margin: 0 auto; }
   .atas { max-width: 1520px; margin: 0 auto; }
@@ -17,7 +27,11 @@
   .atas nav a:hover { color: var(--text); }
 
   /* Pembuka: judul kiri, ajakan kanan, rata bawah */
-  .pembuka { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: 32px 64px; align-items: end; padding-top: clamp(20px, 3.5vh, 48px); }
+  .pembuka { position: relative; isolation: isolate; display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: 32px 64px; align-items: end; padding-top: clamp(20px, 3.5vh, 48px); }
+  .pembuka .kawung-besar { width: min(980px, 78vw); right: max(-22vw, -300px); top: -230px; opacity: 0; animation: kb-muncul 2.4s var(--ease-resap) .3s forwards; }
+  @keyframes kb-muncul { from { opacity: 0; transform: scale(.86) rotate(-20deg); } to { opacity: 1; transform: none; } }
+  @media (max-width: 1080px) { .pembuka .kawung-besar { width: 86vw; right: -46vw; top: -140px; } }
+  @media (max-width: 720px) { .pembuka .kawung-besar { width: 120vw; right: -68vw; top: -100px; } }
   .pembuka h1 { font: 400 clamp(44px, 5.6vw, 84px)/.98 var(--font-serif); letter-spacing: -.02em; text-wrap: balance; }
   .pembuka .ajak p { font-size: 18px; line-height: 1.6; color: var(--text-2); max-width: 34em; }
   .pembuka .tombol { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 24px; }
@@ -71,15 +85,96 @@
   .daftar-layar svg { width: 16px; height: 16px; color: var(--text-3); align-self: center; transition: transform var(--dur-2) var(--ease-resap), color var(--dur-1); }
   .daftar-layar a:hover svg { transform: translateX(3px); color: var(--text); }
 
-  .kaki { margin-top: 64px; display: flex; justify-content: space-between; gap: 24px; flex-wrap: wrap; align-items: end; }
+  /* Bukti di bawah ajakan: tautan ke kontrak terverifikasi dan kode sumber */
+  .bukti-kecil { display: flex; flex-wrap: wrap; gap: 8px 18px; margin-top: 18px; font-size: 14px; color: var(--text-3); }
+  .bukti-kecil a { display: inline-flex; gap: 8px; align-items: center; text-decoration: none; color: var(--text-2); }
+  .bukti-kecil a:hover { color: var(--text); }
+  .bukti-kecil svg { width: 15px; height: 15px; flex: none; color: var(--prada-300); }
+
+  /* Bagian dua kolom: judul kiri, isi kanan (mengikuti .cara dan .batas) */
+  .bagian { margin-top: clamp(64px, 10vh, 120px); display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); gap: 32px 64px; }
+  .bagian > header h2 { font: 400 var(--t-h1)/1.08 var(--font-serif); letter-spacing: -.01em; text-wrap: balance; }
+  .bagian > header p { margin-top: 14px; color: var(--text-2); max-width: 28em; line-height: 1.6; }
+
+  /* Masalah: satu angka besar, dua fakta pendukung */
+  .fakta { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 16px; }
+  .fakta > div { padding: 24px; }
+  .fakta .angka-besar { grid-row: span 2; display: flex; flex-direction: column; justify-content: space-between; gap: 28px; }
+  .fakta .angka-besar b { font: 400 clamp(64px, 7vw, 104px)/.9 var(--font-serif); letter-spacing: -.03em; font-variant-numeric: lining-nums;
+    background: linear-gradient(180deg, var(--mori-50) 30%, var(--gading)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .fakta .angka-besar b span { font-size: .42em; letter-spacing: 0; margin-left: .12em; }
+  .fakta p { color: var(--text-2); font-size: 16px; line-height: 1.6; }
+  .fakta p strong { color: var(--text); font-weight: 500; }
+  .fakta cite { display: block; margin-top: 10px; font-style: normal; font-size: 13px; color: var(--text-3); }
+  .fakta h3 { font: 400 22px/1.2 var(--font-serif); margin-bottom: 8px; }
+
+  /* Pendapatan: satu panel dibagi tiga, sumber utama disorot */
+  .harga { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); overflow: hidden; }
+  .harga > div { padding: 26px 24px 24px; position: relative; display: flex; flex-direction: column; gap: 10px; }
+  .harga > div + div { border-left: 1px solid var(--kaca-garis); }
+  .harga .utama { background: linear-gradient(180deg, rgb(196 161 90 / .12), rgb(196 161 90 / .02) 60%); }
+  .harga .utama::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 2px; background: linear-gradient(90deg, transparent, var(--prada-300), transparent); box-shadow: 0 0 18px rgb(227 202 142 / .7); }
+  .harga .siapa { font-size: 14.5px; color: var(--text-3); }
+  .harga .utama .siapa { color: var(--prada-300); }
+  .harga b { font: 400 34px/1.05 var(--font-serif); letter-spacing: -.01em; }
+  .harga b small { font: 400 15px/1 var(--font-sans); color: var(--text-2); margin-left: 6px; letter-spacing: 0; white-space: nowrap; }
+  .harga p { color: var(--text-2); font-size: 15px; line-height: 1.6; }
+  .harga .contoh-hitung { margin-top: auto; padding-top: 12px; border-top: 1px solid var(--kaca-garis); font-size: 14px; color: var(--text-3); }
+  .harga .contoh-hitung strong { color: var(--text); font-weight: 500; font-variant-numeric: tabular-nums; }
+  .catatan-harga { margin-top: 14px; color: var(--text-3); font-size: 14.5px; line-height: 1.6; max-width: 52em; }
+
+  /* Dibangun di Monad: empat kemampuan yang dipakai */
+  .monad { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+  .monad li { padding: 22px 22px 20px; display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 4px 16px; align-items: start; }
+  .monad .glif { grid-row: span 2; width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center;
+    background: linear-gradient(180deg, rgb(227 202 142 / .2), rgb(196 161 90 / .06)); border: 1px solid rgb(227 202 142 / .22); color: var(--prada-300); }
+  .monad .glif svg { width: 22px; height: 22px; }
+  .monad h3 { font: 500 17px/1.3 var(--font-sans); }
+  .monad p { color: var(--text-2); font-size: 15px; line-height: 1.6; }
+
+  /* Bukti on-chain: kontrak, repo, demo */
+  .kontrak { padding: 6px 22px; }
+  .kontrak .k { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.4fr) auto; gap: 6px 20px; align-items: center; padding: 16px 0; border-bottom: 1px solid var(--kaca-garis); }
+  .kontrak .k:last-child { border-bottom: 0; }
+  .kontrak .k b { font: 400 20px/1.2 var(--font-serif); }
+  .kontrak .k small { display: block; font-size: 13.5px; color: var(--text-3); margin-top: 3px; }
+  .kontrak .alamat-k { font: 500 14px/1.3 var(--font-sans); font-variant-numeric: tabular-nums; color: var(--text-2); overflow-wrap: anywhere; display: flex; gap: 10px; align-items: center; }
+  .kontrak .alamat-k button { flex: none; height: 30px; padding: 0 10px; border-radius: 8px; border: 1px solid var(--kaca-garis); background: rgb(245 239 227 / .04); color: var(--text-2); font-size: 12.5px; cursor: pointer; }
+  .kontrak .alamat-k button:hover { color: var(--text); border-color: var(--line-hover); }
+  .kontrak .terverifikasi { display: inline-flex; gap: 8px; align-items: center; padding: 7px 12px; border-radius: var(--r-pill); font-size: 13.5px; text-decoration: none; white-space: nowrap;
+    color: var(--prada-300); background: rgb(196 161 90 / .1); border: 1px solid rgb(227 202 142 / .22); }
+  .kontrak .terverifikasi:hover { background: rgb(196 161 90 / .18); }
+  .kontrak .terverifikasi svg { width: 14px; height: 14px; }
+  .tautan-bukti { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+
+  /* Rencana: urutan tahap */
+  .rencana { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; counter-reset: r; }
+  .rencana li { counter-increment: r; padding: 22px; position: relative; }
+  .rencana li::before { content: counter(r); position: absolute; right: 20px; top: 16px; font: 400 italic 40px/1 var(--font-serif); color: rgb(227 202 142 / .22); }
+  .rencana .kapan { font-size: 14px; color: var(--prada-300); }
+  .rencana h3 { margin-top: 6px; font: 400 21px/1.2 var(--font-serif); padding-right: 36px; }
+  .rencana p { margin-top: 8px; color: var(--text-2); font-size: 15px; line-height: 1.6; }
+
+  .kaki { margin-top: 80px; padding-top: 28px; border-top: 1px solid var(--line); display: flex; justify-content: space-between; gap: 24px; flex-wrap: wrap; align-items: end; }
   .kaki .peringatan { max-width: 46em; }
+  .kaki .merek-kaki { display: flex; gap: 12px; align-items: center; }
+  .kaki .merek-kaki svg { width: 34px; height: 34px; }
+  .kaki .merek-kaki b { font: 400 22px/1 var(--font-serif); display: block; }
+  .kaki .merek-kaki span { font-size: 13px; color: var(--text-3); }
 
   @media (max-width: 1080px) {
-    .cara, .batas, .layar { grid-template-columns: 1fr; }
+    .cara, .batas, .layar, .bagian { grid-template-columns: 1fr; }
+    .rencana { grid-template-columns: 1fr; }
     .pembuka { grid-template-columns: 1fr; align-items: start; }
   }
   @media (max-width: 720px) {
     .atas nav .jaringan { display: none; }
+    .fakta, .monad { grid-template-columns: 1fr; }
+    .fakta .angka-besar { grid-row: auto; }
+    .harga { grid-template-columns: 1fr; }
+    .harga > div + div { border-left: 0; border-top: 1px solid var(--kaca-garis); }
+    .kontrak .k { grid-template-columns: 1fr; }
+    .kontrak .k .terverifikasi { justify-self: start; }
     .pembuka .tombol .btn { flex: 1 1 auto; }
     .langkah { grid-template-columns: 1fr; gap: 40px; }
     .panggung .tali, .panggung .label-kain.pg { display: none; }
@@ -104,7 +199,7 @@
 </header>
 
 <main>
-  <section class="pembuka">
+  <section class="pembuka" id="pembuka">
     <h1 class="resap" id="judul">Harta pusaka digital, dibagi sesuai faraid.</h1>
     <div class="ajak">
       <p class="resap" style="--i:2">Aturan warisan dipasang di dompetmu sendiri. Setelah dua dari tiga saksi mengonfirmasi wafat dan masa sanggah lewat, bagian tiap ahli waris masuk ke rekening banknya, atau ke amplop digital yang dicairkan dari HP. Ahli waris tidak perlu dompet kripto, dan kamu tidak perlu menekan tombol apa pun untuk membuktikan masih hidup.</p>
@@ -112,6 +207,10 @@
         <a class="btn" href="pewaris.html" id="mulai">Mulai demo</a>
         <a class="btn btn--garis" href="kalkulator.html">Buka kalkulator faraid</a>
       </div>
+      <p class="bukti-kecil resap" style="--i:4">
+        <a id="tautanKontrak" href="#bukti"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.5l1.7 1.2 2.1-.1.6 2 1.7 1.3-.7 2 .7 2-1.7 1.3-.6 2-2.1-.1L8 14.5l-1.7-1.2-2.1.1-.6-2-1.7-1.3.7-2-.7-2 1.7-1.3.6-2 2.1.1z" fill="currentColor" opacity=".25"/><path d="M5.2 8.2l1.9 1.9 3.8-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Kontrak terverifikasi di Monad testnet</span></a>
+        <a href="https://github.com/astrorehan/pusaka" target="_blank" rel="noopener"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5.5 4.5 2 8l3.5 3.5M10.5 4.5 14 8l-3.5 3.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Kode sumber terbuka</span></a>
+      </p>
     </div>
   </section>
 
@@ -125,6 +224,23 @@
       </div>
     </div>
     <div class="legenda" id="legenda"></div>
+  </section>
+
+
+  <section class="bagian" aria-labelledby="jMasalah">
+    <header>
+      <h2 id="jMasalah">Saat pemilik kunci wafat, hartanya ikut terkunci.</h2>
+      <p>Bank, notaris, dan pengadilan tidak bisa mengatur ulang kunci dompet kripto. Membagikan seed phrase semasa hidup berisiko dicuri, tidak membagikannya berarti hilang.</p>
+    </header>
+    <div class="fakta">
+      <div class="angka-besar lembar">
+        <b>22,69<span>juta</span></b>
+        <div><p>investor kripto terdaftar di Indonesia, sebagian besar Muslim. Pembagian warisan mereka di Pengadilan Agama merujuk <strong>Kompilasi Hukum Islam</strong>.</p>
+        <cite>Bisnis.com, 10 Agustus 2026, data per Juni 2026</cite></div>
+      </div>
+      <div class="lembar"><h3>Belum ada aturannya</h3><p>Majalah Badan Peradilan Umum MA menyebut pewarisan aset kripto sebagai kekosongan hukum. Hakim bisa mengakui hak waris, tetapi tidak bisa memaksakan eksekusinya.</p><cite>Dandapala, 3 Agustus 2026</cite></div>
+      <div class="lembar"><h3>Dompet pribadi tanpa jalur</h3><p>Aset di exchange masih bisa diklaim dengan akta kematian. Aset di dompet pribadi dan DeFi tidak punya jalur apa pun.</p></div>
+    </div>
   </section>
 
   <section class="cara">
@@ -162,6 +278,75 @@
     </div>
   </section>
 
+
+  <section class="bagian" aria-labelledby="jHarga">
+    <header>
+      <h2 id="jHarga">Warisannya tidak dipotong.</h2>
+      <p>Kontrak membagi seluruh harta sesuai urutan KHI. Pusaka dibayar dari layanan yang dipakai keluarga dan mitra, tidak dari kematian seseorang.</p>
+    </header>
+    <div>
+      <div class="harga panel">
+        <div>
+          <span class="siapa">Untuk pewaris</span>
+          <b>Gratis</b>
+          <p>Memasang aturan, memilih saksi, bukti hidup, dan pembagian. Langganan tahunan opsional untuk pengingat WhatsApp, dokumen penetapan ahli waris, dan banyak jenis aset.</p>
+        </div>
+        <div class="utama">
+          <span class="siapa">Sumber utama</span>
+          <b>Rp5.000<small>per pencairan</small></b>
+          <p>Ditagih saat bagian ditransfer ke rekening atau e-wallet, seperti biaya antarbank. Dibagi dengan mitra pencairan berizin.</p>
+          <p class="contoh-hitung">Keluarga contoh: 5 pencairan, <strong>Rp25.000</strong> per warisan</p>
+        </div>
+        <div>
+          <span class="siapa">Untuk exchange dan dompet</span>
+          <b>Lisensi</b>
+          <p>Biaya integrasi ditambah biaya per pengguna aktif per tahun. Mereka mendapat fitur warisan sesuai faraid, Pusaka mendapat pengguna dengan biaya akuisisi rendah.</p>
+        </div>
+      </div>
+      <p class="catatan-harga">Potongan persentase dari warisan hanya sah jika disepakati pewaris semasa hidup sebagai upah, dan tetap terdengar seperti untung dari orang meninggal. Biaya pencairan dan lisensi menghindari keduanya.</p>
+    </div>
+  </section>
+
+  <section class="bagian" aria-labelledby="jMonad">
+    <header>
+      <h2 id="jMonad">Hanya masuk akal di Monad.</h2>
+      <p>Empat kemampuan Monad yang membuat warisan on-chain terasa seperti aplikasi biasa bagi keluarga.</p>
+    </header>
+    <ul class="monad">
+      <li class="lembar"><span class="glif"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="6" width="17" height="13" rx="3" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M3.5 10h17" stroke="currentColor" stroke-width="1.5"/><circle cx="16.5" cy="14.5" r="1.4" fill="currentColor"/><path d="M8 3.5h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></span><h3>Aturan di dompet yang sudah ada</h3><p>EIP-7702 menambahkan aturan warisan ke dompet pewaris. Hartanya tidak dipindah ke brankas, kuncinya tetap di tangannya.</p></li>
+      <li class="lembar"><span class="glif"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10.5a5 5 0 0 1 10 0v2.5M12 10.5v5.5M9.3 13v3.8M14.7 13.5V18M5 13.5c0 3 1 5 2.2 6.5M19 14.5c0 2-.6 3.6-1.4 5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></span><h3>Sidik jari sebagai bukti hidup</h3><p>Precompile P-256 memverifikasi passkey langsung di kontrak. Sentuhan sidik jari atau wajah di HP tercatat on-chain, tanpa biaya untuk pewaris.</p></li>
+      <li class="lembar"><span class="glif"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5 20 8v8l-8 4.5L4 16V8z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M4 8l8 4.5L20 8M12 12.5v8" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg></span><h3>Faraid lengkap di dalam kontrak</h3><p>ʻAul, radd, dan gharrawain dihitung on-chain. Kontraknya sekitar 28 KB, di atas batas 24 KB Ethereum, dan Monad mengizinkannya.</p></li>
+      <li class="lembar"><span class="glif"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 3 5.5 13.5H12L11 21l7.5-10.5H12z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg></span><h3>Final dalam satu-dua detik</h3><p>Konfirmasi saksi, kabar hidup, dan pembagian selesai sebelum keluarga sempat bertanya apakah sudah masuk.</p></li>
+    </ul>
+  </section>
+
+  <section class="bagian" id="bukti" aria-labelledby="jBukti">
+    <header>
+      <h2 id="jBukti">Semuanya bisa diperiksa.</h2>
+      <p>Kontrak sudah di-deploy di Monad testnet dan kode sumbernya terverifikasi. Setiap tombol di demo mengirim transaksi sungguhan.</p>
+    </header>
+    <div>
+      <div class="kontrak panel" id="daftarKontrak"></div>
+      <div class="tautan-bukti">
+        <a class="btn btn--garis btn--kecil" href="https://github.com/astrorehan/pusaka" target="_blank" rel="noopener">Repo GitHub</a>
+        <a class="btn btn--garis btn--kecil" href="https://astrorehan.github.io/pusaka/" target="_blank" rel="noopener">Demo publik</a>
+        <a class="btn btn--garis btn--kecil" href="kalkulator.html">Kalkulator faraid</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="bagian" aria-labelledby="jRencana">
+    <header>
+      <h2 id="jRencana">Setelah hari ini.</h2>
+      <p>Urutan kerja dari prototipe testnet sampai dipakai di exchange.</p>
+    </header>
+    <ol class="rencana">
+      <li class="lembar"><span class="kapan">Bulan pertama</span><h3>Mitra pencairan berizin</h3><p>Redeem stablecoin rupiah ke BI-FAST, pengingat lewat WhatsApp, dan konfirmasi saksi dengan passkey.</p></li>
+      <li class="lembar"><span class="kapan">Bulan kedua dan ketiga</span><h3>Validasi dengan ahli</h3><p>Ahli faraid, hakim Pengadilan Agama, dan notaris. Ditambah saudara, kakek-nenek, ahli waris pengganti, serta utang dan biaya jenazah.</p></li>
+      <li class="lembar"><span class="kapan">2027</span><h3>Mainnet dan exchange</h3><p>Setelah aturan stablecoin OJK terbit: mainnet dengan rupiah digital, tombol warisan di exchange, dan audit keamanan.</p></li>
+    </ol>
+  </section>
+
   <section class="layar">
     <div>
       <h2>Layar demo</h2>
@@ -171,6 +356,7 @@
   </section>
 
   <footer class="kaki">
+    <div class="merek-kaki"><span id="logoKaki"></span><div><b>Pusaka</b><span>Harta pusaka digital, dibagi sesuai faraid</span></div></div>
     <p class="peringatan">Prototipe di Monad testnet dengan rupiah mainan (tIDR). Transfer bank disimulasikan. Kunci demo hanya untuk testnet, jangan pernah memakai private key dompet asli. Bukan nasihat hukum atau fatwa.</p>
     <span class="t-micro">Monad Blitz Jogja Vol. 2</span>
   </footer>
@@ -182,6 +368,34 @@ const D = Pusaka;
 Latar.pasang();
 Demo.panel({ judul: 'Panel demo' });
 document.getElementById('logo').outerHTML = UI.MEREK;
+document.getElementById('logoKaki').outerHTML = UI.MEREK;
+document.getElementById('pembuka').insertAdjacentHTML('afterbegin', UI.kawungBesar('putar cahaya'));
+
+/* ---------- bukti on-chain: alamat dibaca dari konfigurasi yang sama dengan demo ---------- */
+{
+  const EX = Demo.EXPLORER, A = Demo.alamat;
+  const CEK = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  const baris = [
+    ['PusakaWallet', 'Aturan warisan, faraid, saksi, bukti hidup', A.wallet],
+    ['MitraCair', 'Rekening virtual dan pencairan ke bank', A.mitra],
+    ['MockIDR (tIDR)', 'Rupiah mainan untuk testnet', A.token],
+  ].filter((b) => b[2]);
+  document.getElementById('daftarKontrak').innerHTML = baris.map(([n, k, a]) => `<div class="k">
+      <div><b>${n}</b><small>${k}</small></div>
+      <div class="alamat-k"><span>${a.slice(0, 10)}…${a.slice(-8)}</span><button type="button" data-salin="${a}">Salin</button></div>
+      ${EX ? `<a class="terverifikasi" href="${EX}/address/${a}" target="_blank" rel="noopener">${CEK}Terverifikasi, lihat source</a>` : '<span class="t-micro">Blockchain lokal</span>'}
+    </div>`).join('');
+  document.getElementById('daftarKontrak').addEventListener('click', async (e) => {
+    const b = e.target.closest('[data-salin]');
+    if (!b) return;
+    try { await navigator.clipboard.writeText(b.dataset.salin); b.textContent = 'Tersalin'; } catch { b.textContent = 'Gagal'; }
+    setTimeout(() => { b.textContent = 'Salin'; }, 1600);
+  });
+  if (EX && A.wallet) {
+    const t = document.getElementById('tautanKontrak');
+    t.href = `${EX}/address/${A.wallet}`; t.target = '_blank'; t.rel = 'noopener';
+  }
+}
 UI.blok(document.getElementById('jaringan'));
 
 /* ---------- daftar layar ---------- */

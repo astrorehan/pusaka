@@ -492,6 +492,7 @@ async function kirim(a, req, sebab) {
     const hasil = { tx, blok: Number(r.blockNumber), detik: (performance.now() - t0) / 1000, gas: Number(r.gasUsed) };
     finalTerakhir[sebab] = hasil;
     bc && bc.postMessage({ jenis: 'final', sebab, hasil });
+    try { struk(sebab, hasil); } catch (e) { console.warn('struk', e); }
     return hasil;
   });
 }
@@ -1020,19 +1021,48 @@ async function nominalDariKontrak() {
 }
 
 /* ---------- pesan kecil di layar ---------- */
-let toastEl, toastT;
-function toast(teks) {
-  if (!toastEl) {
-    toastEl = document.createElement('div');
-    toastEl.setAttribute('role', 'status');
-    toastEl.style.cssText = 'position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:9999;max-width:min(560px,calc(100vw - 32px));'
-      + 'padding:12px 16px;background:#1b2440;color:#f5efe3;border:1px solid #b59c6c;font:14px/1.45 var(--font-sans,system-ui);box-shadow:0 8px 30px rgba(0,0,0,.35);transition:opacity .3s';
-    document.body.appendChild(toastEl);
+/* Kabar singkat dan struk transaksi menumpuk di pojok kanan bawah (gaya di base.css: .toast, .struk). */
+let tumpukEl;
+function tumpuk() {
+  if (!tumpukEl || !tumpukEl.isConnected) {
+    tumpukEl = document.createElement('div');
+    tumpukEl.className = 'toast-tumpuk';
+    tumpukEl.setAttribute('role', 'status');
+    tumpukEl.setAttribute('aria-live', 'polite');
+    document.body.appendChild(tumpukEl);
   }
-  toastEl.textContent = teks;
-  toastEl.style.opacity = '1';
-  clearTimeout(toastT);
-  toastT = setTimeout(() => { toastEl.style.opacity = '0'; }, 5200);
+  return tumpukEl;
+}
+function tampilkan(el, lama) {
+  const host = tumpuk();
+  host.appendChild(el);
+  while (host.children.length > 3) host.firstElementChild.remove();
+  setTimeout(() => { el.classList.add('pergi'); setTimeout(() => el.remove(), 400); }, lama);
+}
+function toast(teks, { galat = true } = {}) {
+  const el = document.createElement('div');
+  el.className = 'toast' + (galat ? ' galat' : '');
+  el.textContent = teks;
+  tampilkan(el, 5200);
+}
+/* Struk: tiap transaksi yang dikirim dari browser ini, dengan blok, lama konfirmasi, dan tautan explorer */
+const JUDUL_STRUK = {
+  pasang: 'Aturan warisan terpasang', cabut: 'Aturan dicabut dari dompet', dipicu: 'Masa sanggah dimulai',
+  kabar: 'Kabar hidup tercatat', hidup: 'Bukti hidup tercatat', aktivitas: 'Pembayaran tercatat sebagai bukti hidup',
+  batal: 'Masa sanggah dibatalkan', sidik: 'Sidik jari diperbarui', dibagikan: 'Warisan dibagikan sesuai faraid',
+};
+const judulStruk = (sebab) => JUDUL_STRUK[sebab] || (/^saksi/.test(sebab) ? 'Konfirmasi saksi tercatat' : /^cair-/.test(sebab) ? 'Amplop dicairkan' : '');
+function struk(sebab, h) {
+  const judul = judulStruk(sebab);
+  if (!judul || q.has('diam')) return;
+  const el = document.createElement('div');
+  el.className = 'toast struk';
+  const detik = Math.max(0.1, h.detik).toLocaleString('id-ID', { maximumFractionDigits: 1 });
+  el.innerHTML = `<span class="tanda" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+    <b></b><small>Final di blok ${h.blok.toLocaleString('id-ID')} dalam ${detik} detik</small>
+    ${EXPLORER ? `<a href="${EXPLORER}/tx/${h.tx}" target="_blank" rel="noopener">Lihat transaksi di MonadVision <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M4 2h6v6M10 2 3 9" fill="none" stroke="currentColor" stroke-width="1.4"/></svg></a>` : ''}`;
+  el.querySelector('b').textContent = judul;
+  tampilkan(el, 7000);
 }
 let pesanEl;
 function peringatan(teks) {

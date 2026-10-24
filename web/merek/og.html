@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="id"><head><meta charset="utf-8">
+<link rel="stylesheet" href="../assets/fonts.css">
+<link rel="stylesheet" href="../assets/tokens.css">
+<style>
+  html, body { margin: 0; width: 1200px; height: 630px; overflow: hidden; }
+  body { background: radial-gradient(700px 500px at 82% -10%, rgb(196 161 90 / .22), transparent 70%), radial-gradient(600px 600px at -5% 40%, rgb(69 89 138 / .45), transparent 70%), #131b33; color: #f5efe3; font-family: var(--font-sans); position: relative; }
+  .pita { position: absolute; left: 0; right: 0; bottom: 0; height: 92px; background-color: #ede5d4;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='46' height='46'%3E%3Cpath fill='%23c9b997' d='M24.415 7.585A5.2 3.4 -45 0 0 17.061 14.939A5.2 3.4 -45 0 0 24.415 7.585ZM7.585 7.585A5.2 3.4 45 0 1 14.939 14.939A5.2 3.4 45 0 1 7.585 7.585ZM7.585 24.415A5.2 3.4 -45 0 0 14.939 17.061A5.2 3.4 -45 0 0 7.585 24.415ZM24.415 24.415A5.2 3.4 45 0 1 17.061 17.061A5.2 3.4 45 0 1 24.415 24.415Z'/%3E%3C/svg%3E");
+    background-size: 46px 46px; background-position: 0 0; border-top: 10px solid #674026; box-shadow: inset 0 10px 0 #93633a; }
+  .pita::after { content: ''; position: absolute; inset: 0; background: linear-gradient(105deg, transparent 0 34%, rgb(147 99 58 / .55) 34% 52%, rgb(69 89 138 / .45) 52% 66%, rgb(196 161 90 / .45) 66% 78%, rgb(124 78 45 / .5) 78% 100%); mix-blend-mode: multiply; }
+  .isi { position: absolute; left: 84px; top: 78px; right: 84px; display: grid; grid-template-columns: 220px 1fr; gap: 56px; align-items: center; }
+  .ikon { position: relative; width: 176px; height: 176px; justify-self: center; }
+  .ikon::before { content: ''; position: absolute; inset: -60%; border-radius: 50%; background: radial-gradient(closest-side, rgb(227 202 142 / .38), rgb(196 161 90 / .12) 45%, transparent 72%); }
+  .ikon svg { position: relative; width: 100%; height: 100%; overflow: visible; filter: drop-shadow(0 0 22px rgb(227 202 142 / .45)); }
+  .merek { display: flex; align-items: baseline; gap: 16px; }
+  .merek b { font: 400 40px/1 var(--font-serif); }
+  .merek span { font: 400 20px/1 'Javanese Text', 'Noto Sans Javanese'; color: #97a4c3; }
+  h1 { margin: 22px 0 0; font: 400 64px/1.02 var(--font-serif); letter-spacing: -.02em; }
+  p { margin: 22px 0 0; font-size: 24px; line-height: 1.45; color: #c4cbdc; max-width: 30em; }
+  .chip { display: inline-flex; gap: 10px; align-items: center; margin-top: 26px; padding: 10px 16px; border-radius: 999px; font-size: 18px; color: #e3ca8e; background: rgb(196 161 90 / .12); border: 1px solid rgb(227 202 142 / .3); }
+  .chip i { width: 9px; height: 9px; border-radius: 50%; background: #e3ca8e; box-shadow: 0 0 12px #e3ca8e; }
+</style></head><body>
+<div class="isi">
+  <div class="ikon"><svg viewBox="6.6 6.6 18.8 18.8"><defs><filter id="g" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation=".7" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><path fill="#fff8ec" filter="url(#g)" d="M24.415 7.585A5.2 3.4 -45 0 0 17.061 14.939A5.2 3.4 -45 0 0 24.415 7.585ZM7.585 7.585A5.2 3.4 45 0 1 14.939 14.939A5.2 3.4 45 0 1 7.585 7.585ZM7.585 24.415A5.2 3.4 -45 0 0 14.939 17.061A5.2 3.4 -45 0 0 7.585 24.415ZM24.415 24.415A5.2 3.4 45 0 1 17.061 17.061A5.2 3.4 45 0 1 24.415 24.415Z"/><circle cx="16" cy="16" r="1.2" fill="#e3ca8e"/></svg></div>
+  <div>
+    <div class="merek"><b>Pusaka</b><span lang="jv">ꦥꦸꦱꦏ</span></div>
+    <h1>Harta pusaka digital, dibagi sesuai faraid.</h1>
+    <p>Aturan warisan dipasang di dompetmu sendiri. Ahli waris menerima bagiannya di rekening bank, tanpa dompet kripto.</p>
+    <span class="chip"><i></i>Berjalan di Monad testnet</span>
+  </div>
+</div>
+<div class="pita"></div>
+</body></html>

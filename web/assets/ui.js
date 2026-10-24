@@ -1,6 +1,8 @@
 /* Pusaka · Nila — helper UI bersama untuk semua layar */
 window.UI = (() => {
-  const MEREK = `<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="2.5" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M7 21.5 L12.5 2.5 M12 21.5 L17.5 2.5" stroke="currentColor" stroke-width="1.3"/></svg>`;
+  /* Logo: kawung tanpa bingkai. Empat kelopak putih bercahaya dari satu pusat emas = harta yang dibagi adil. */
+  const KELOPAK = 'M24.415 7.585A5.2 3.4 -45 0 0 17.061 14.939A5.2 3.4 -45 0 0 24.415 7.585ZM7.585 7.585A5.2 3.4 45 0 1 14.939 14.939A5.2 3.4 45 0 1 7.585 7.585ZM7.585 24.415A5.2 3.4 -45 0 0 14.939 17.061A5.2 3.4 -45 0 0 7.585 24.415ZM24.415 24.415A5.2 3.4 45 0 1 17.061 17.061A5.2 3.4 45 0 1 24.415 24.415Z';
+  const MEREK = `<svg class="logo" viewBox="6.6 6.6 18.8 18.8" aria-hidden="true"><path class="logo-k" d="${KELOPAK}"/><circle class="logo-titik" cx="16" cy="16" r="1.2"/></svg>`;
 
   /* Resapan teks: picu ulang animasi .resap */
   function masuk(target) {
@@ -121,5 +123,17 @@ window.UI = (() => {
     return d;
   }
 
-  return { MEREK, masuk, blok, digit, lalu, durasi, tahan, hitungNaik, alamat, dompetDemo, mon };
+  /* Kepala halaman yang menempel mendapat alas kaca begitu halaman digulir */
+  const atas = document.querySelector('body > .atas');
+  if (atas) { const f = () => atas.classList.toggle('lengket', scrollY > 6); addEventListener('scroll', f, { passive: true }); f(); }
+
+  /* Kawung besar untuk latar (supergrafis). Kelopak terpisah (.kb-k0..3, urut searah jarum jam dari kiri atas)
+     agar bisa dinyalakan satu per satu. */
+  function kawungBesar(kelas = '') {
+    const P = KELOPAK.split('Z').filter(Boolean).map((d) => d + 'Z');
+    const urut = [1, 0, 3, 2]; // KELOPAK: kanan atas, kiri atas, kiri bawah, kanan bawah
+    return `<div class="kawung-besar ${kelas}" aria-hidden="true"><svg viewBox="6.6 6.6 18.8 18.8">${P.map((d, i) => `<path class="kb-k kb-k${urut[i]}" d="${d}"/>`).join('')}<circle class="kb-titik" cx="16" cy="16" r="1.2"/></svg></div>`;
+  }
+
+  return { MEREK, kawungBesar, masuk, blok, digit, lalu, durasi, tahan, hitungNaik, alamat, dompetDemo, mon };
 })();

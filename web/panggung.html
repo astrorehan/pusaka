@@ -2,12 +2,14 @@
 <html lang="id">
 <head>
 <meta charset="utf-8">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='4' fill='%23131b33'/%3E%3Crect x='4.5' y='4.5' width='15' height='15' fill='none' stroke='%23f5efe3' stroke-width='1.4'/%3E%3Cpath d='M8 19.5 12.4 4.5M12 19.5 16.3 4.5' stroke='%23f5efe3' stroke-width='1.4'/%3E%3C/svg%3E">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Panggung — Pusaka</title>
 <link rel="stylesheet" href="assets/fonts.css">
 <link rel="stylesheet" href="assets/tokens.css">
 <link rel="stylesheet" href="assets/base.css">
+<script src="pembuka.js"></script>
 <style>
   /* Artboard 1920×1080 diskalakan agar pas di proyektor apa pun */
   html, body { height: 100%; overflow: hidden; }
@@ -52,6 +54,13 @@
   .btn-bagikan.on { pointer-events: auto; }
 
   .pg-kain { position: absolute; left: 80px; top: 296px; }
+  /* Supergrafis: kawung raksasa di belakang kain. Menyala per kelopak saat warisan dibagikan. */
+  .artboard { isolation: isolate; }
+  .artboard > .kawung-besar { left: 1010px; top: -170px; width: 1420px; z-index: 0; opacity: 0; }
+  .artboard > .kawung-besar .kb-k { fill: rgb(255 248 236 / .045); stroke: rgb(255 248 236 / .12); stroke-width: .04; }
+  .artboard > .kawung-besar .kb-k.nyala { fill: rgb(227 202 142 / .13); stroke: rgb(240 220 170 / .6); stroke-width: .06; }
+  .artboard > .kawung-besar.selesai svg { filter: drop-shadow(0 0 60px rgb(227 202 142 / .3)); }
+
   .pg-tali { position: absolute; inset: 0; width: 1920px; height: 1080px; pointer-events: none; overflow: visible; }
   .label-kain.pg { position: absolute; width: 176px; padding: 24px 10px 12px; }
   .label-kain.pg.lebar { width: 224px; }
@@ -93,7 +102,7 @@
 <div class="artboard" id="ab">
   <header class="pg-atas">
     <a class="merek" href="index.html" aria-label="Pusaka">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="2.5" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M7 21.5 L12.5 2.5 M12 21.5 L17.5 2.5" stroke="currentColor" stroke-width="1.3"/></svg>
+      <svg class="logo" viewBox="6.6 6.6 18.8 18.8" aria-hidden="true"><path class="logo-k" d="M24.415 7.585A5.2 3.4 -45 0 0 17.061 14.939A5.2 3.4 -45 0 0 24.415 7.585ZM7.585 7.585A5.2 3.4 45 0 1 14.939 14.939A5.2 3.4 45 0 1 7.585 7.585ZM7.585 24.415A5.2 3.4 -45 0 0 14.939 17.061A5.2 3.4 -45 0 0 7.585 24.415ZM24.415 24.415A5.2 3.4 45 0 1 17.061 17.061A5.2 3.4 45 0 1 24.415 24.415Z"/><circle class="logo-titik" cx="16" cy="16" r="1.2"/></svg>
       <b>Pusaka</b><span class="aksara" lang="jv">ꦥꦸꦱꦏ</span>
     </a>
     <div class="blok"><i id="blokTitik"></i><span>Monad testnet</span><span>blok <b id="blok">…</b></span></div>
@@ -146,6 +155,7 @@ const S = Demo, D = Pusaka;
 /* Galat di satu callback tidak boleh menghentikan animasi atau pembacaan kontrak untuk layar proyektor */
 const aman = (f) => (...a) => { try { return f(...a); } catch (e) { console.error(e); } };
 Latar.pasang();
+document.getElementById('ab').insertAdjacentHTML('afterbegin', UI.kawungBesar('putar'));
 const panel = Demo.panel({ judul: 'Panel demo (tekan ` untuk buka)' });
 // pintasan presenter dicantumkan di panel demo
 const isiPanel = panel.querySelector && panel.querySelector('.isi');
@@ -546,6 +556,7 @@ function statis() {
     taliEls.forEach((t) => { const L = t.getTotalLength(); gsap.set(t, { strokeDasharray: L, strokeDashoffset: L }); });
     return;
   }
+  kawungKeadaan(s.status === 3 ? 4 : 0, { muncul: s.status === 3 });
   if (s.status === 3) {
     kain.keadaanAkhir();
     setChip('dibagikan', 'Dibagikan');
@@ -621,6 +632,23 @@ function ayun(kuat = 1) {
   return tl;
 }
 
+/* Supergrafis kawung: tiap kelopak menyala saat bagiannya dibagikan (harta bersama, wasiat, faraid) */
+const kawungEl = () => document.querySelector('.artboard > .kawung-besar');
+function kawungKeadaan(n, { muncul = n > 0 } = {}) {
+  const k = kawungEl(); if (!k) return;
+  k.querySelectorAll('.kb-k').forEach((el) => el.classList.toggle('nyala', [...el.classList].some((c) => /^kb-k\d$/.test(c) && Number(c.slice(4)) < n)));
+  k.classList.toggle('selesai', n >= 4);
+  gsap.set(k, { opacity: muncul ? 1 : 0 });
+}
+function kawungMekar(tl) {
+  const k = kawungEl(); if (!k) return;
+  kawungKeadaan(0, { muncul: false });
+  tl.fromTo(k, { opacity: 0, scale: .82, rotation: -25 }, { opacity: 1, scale: 1, rotation: 0, duration: 2.4, ease: 'power3.out', transformOrigin: '50% 50%' }, 0);
+  [[0, .9], [1, 3.8], [2, 6.1], [3, 6.6]].forEach(([i, at]) => tl.call(() => k.querySelector('.kb-k' + i).classList.add('nyala'), null, at));
+  tl.call(() => k.classList.add('selesai'), null, 10.8)
+    .fromTo(k, { scale: 1 }, { scale: 1.04, duration: .9, yoyo: true, repeat: 1, ease: 'sine.inOut' }, 10.8);
+}
+
 /* Momen signature: celup menurut urutan KHI */
 const JEDA_KABAR = 1; // detik setelah label selesai berayun: kalimat "terbagi habis" sempat terbaca, baru kabar pencairan tampak
 function bagikan() {
@@ -636,6 +664,7 @@ function bagikan() {
   tampilSaksi(false);
   document.getElementById('judul').textContent = 'Harta almarhum Budi Santoso';
   tl.add(kain.rendam(0, 1.2), 0);
+  kawungMekar(tl);
   // nominal berubah jadi besar, lalu dihitung naik
   labels.forEach((l) => { l.nom.textContent = 'Rp0 jt'; l.div.classList.add('terima'); });
   tl.to(labels.map((l) => l.nom), { fontSize: (i) => (labels[i].p.id === 'istri' ? 40 : 36), duration: .7, ease: 'power3.out' }, .2);

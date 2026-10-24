@@ -24,6 +24,9 @@ setiap tombol mengirim transaksi sungguhan.
 | `src/demo.js` | Status dari kontrak → `window.Demo`, aksi → transaksi, operator mitra (simulasi bank) |
 | `src/boot.js` | Dimuat pertama oleh setiap layar |
 | `src/abi.js` | ABI hasil `npm run abi` (dari `contracts/out`) |
+| `public/pembuka.js` | Layar pembuka: logo kawung bercahaya selama layar membaca kontrak, ditutup oleh `boot.js` |
+| `public/` | Logo (`logo.svg`, `favicon.svg`), ikon HP, dan gambar pratinjau tautan `og.png` |
+| `merek/` | Sumber `og.png` dan ikon HP. Render ulang: `msedge --headless=new --screenshot=public/og.png --window-size=1200,630 http://localhost:5180/merek/og.html` |
 | `scripts/deploy-lokal.mjs` | Deploy semua kontrak ke anvil dan menulis alamatnya ke `.env.local` |
 | `scripts/e2e.mjs` | Uji ujung ke ujung tanpa browser |
 
@@ -134,4 +137,5 @@ https://astrorehan.github.io/pusaka/. Isi ulang saldo induk publik dengan `MON=1
   domain: yang dibuat di `localhost` tidak berlaku di domain Vercel, dan sebaliknya. Ia juga terikat pada pewaris, jadi
   setelah *Pewaris baru* perlu diaktifkan lagi.
 - Kalkulator masih menghitung di browser dengan salinan JS aturan faraid (`assets/data.js`).
-- Huruf masih dimuat dari CDN Fontshare dan Google Fonts. Jika tidak ada internet, tampilan memakai huruf cadangan.
+- Huruf Gambetta dan Ranade disimpan di `assets/fonts/` (bukan dari CDN), jadi tampilan tetap sama tanpa internet.
+  Aksara Jawa di merek memakai font sistem.

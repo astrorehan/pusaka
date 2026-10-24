@@ -5,7 +5,10 @@ import '../assets/kain.js';
 import { siapkan } from './demo.js';
 import '../assets/ui.js';
 
-await siapkan();
+try { await siapkan(); } finally {
+  // Layar pembuka (public/pembuka.js) ditutup setelah skrip halaman sempat menggambar isinya.
+  requestAnimationFrame(() => setTimeout(() => window.PembukaPusaka && window.PembukaPusaka.tutup(), 60));
+}
 
 /* Teks contoh di markup diganti data asli: alamat pewaris, alamat PusakaWallet, nama jaringan. */
 const GANTI = [

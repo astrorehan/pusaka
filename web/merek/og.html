@@ -18,8 +18,10 @@
   .merek span { font: 400 20px/1 'Javanese Text', 'Noto Sans Javanese'; color: #97a4c3; }
   h1 { margin: 22px 0 0; font: 400 64px/1.02 var(--font-serif); letter-spacing: -.02em; }
   p { margin: 22px 0 0; font-size: 24px; line-height: 1.45; color: #c4cbdc; max-width: 30em; }
-  .chip { display: inline-flex; gap: 10px; align-items: center; margin-top: 26px; padding: 10px 16px; border-radius: 999px; font-size: 18px; color: #e3ca8e; background: rgb(196 161 90 / .12); border: 1px solid rgb(227 202 142 / .3); }
-  .chip i { width: 9px; height: 9px; border-radius: 50%; background: #e3ca8e; box-shadow: 0 0 12px #e3ca8e; }
+  .jejak { display: flex; align-items: center; gap: 18px; margin-top: 30px; font-size: 15px; letter-spacing: .22em; text-transform: uppercase; color: #e3ca8e; }
+  .jejak::before { content: ""; width: 44px; height: 1px; background: linear-gradient(90deg, transparent, #e3ca8e); }
+  .jejak b { font-weight: 500; color: #f5efe3; }
+  .jejak s { text-decoration: none; opacity: .45; }
 </style></head><body>
 <div class="isi">
   <div class="ikon"><svg viewBox="6.6 6.6 18.8 18.8"><defs><filter id="g" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation=".7" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><path fill="#fff8ec" filter="url(#g)" d="M24.415 7.585A5.2 3.4 -45 0 0 17.061 14.939A5.2 3.4 -45 0 0 24.415 7.585ZM7.585 7.585A5.2 3.4 45 0 1 14.939 14.939A5.2 3.4 45 0 1 7.585 7.585ZM7.585 24.415A5.2 3.4 -45 0 0 14.939 17.061A5.2 3.4 -45 0 0 7.585 24.415ZM24.415 24.415A5.2 3.4 45 0 1 17.061 17.061A5.2 3.4 45 0 1 24.415 24.415Z"/><circle cx="16" cy="16" r="1.2" fill="#e3ca8e"/></svg></div>
@@ -27,7 +29,7 @@
     <div class="merek"><b>Pusaka</b><span lang="jv">ꦥꦸꦱꦏ</span></div>
     <h1>Harta pusaka digital, dibagi sesuai faraid.</h1>
     <p>Aturan warisan dipasang di dompetmu sendiri. Ahli waris menerima bagiannya di rekening bank, tanpa dompet kripto.</p>
-    <span class="chip"><i></i>Berjalan di Monad testnet</span>
+    <div class="jejak"><b>Monad</b><s>·</s>EIP-7702<s>·</s>Faraid KHI</div>
   </div>
 </div>
 <div class="pita"></div>

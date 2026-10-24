@@ -86,11 +86,22 @@ Monad testnet, chain id `10143`. Source verified on Sourcify (exact match).
 | `MitraCair` | [`0x04405E9Fd9ed041F81086259Bf200990B9EC315F`](https://testnet.monadvision.com/address/0x04405E9Fd9ed041F81086259Bf200990B9EC315F) | Payout partner: per-heir virtual bank accounts, envelope cash-out |
 | `MockIDR` (tIDR) | [`0xbEe6644173F8eB599d83B9a6A92e7BE14b4242aB`](https://testnet.monadvision.com/address/0xbEe6644173F8eB599d83B9a6A92e7BE14b4242aB) | Play-money rupiah token (ERC-20 + permit) |
 
+### Monad mainnet
+
+The same contracts are also deployed on Monad mainnet, chain id `143`. Source verified on Sourcify (exact match). The live
+demo runs on testnet so visitors can use it with play money.
+
+| Contract | Address |
+|---|---|
+| `PusakaWallet` | [`0xf9749b6639a6C38f0904DE9Da7CF5AaE6d2e9286`](https://monadvision.com/address/0xf9749b6639a6C38f0904DE9Da7CF5AaE6d2e9286) |
+| `MitraCair` | [`0x75ba83644f8d2AC4d547c39Fb19a7f95D326ED3E`](https://monadvision.com/address/0x75ba83644f8d2AC4d547c39Fb19a7f95D326ED3E) |
+| `MockIDR` (tIDR) | [`0x824ce141538860ffc96bc5f244716AdA60B8843B`](https://monadvision.com/address/0x824ce141538860ffc96bc5f244716AdA60B8843B) |
+
 | | |
 |---|---|
 | Live app | https://pusaka-faraid.vercel.app |
 | Repository | https://github.com/astrorehan/pusaka |
-| Deploy record | [`contracts/broadcast/Deploy.s.sol/10143/run-latest.json`](contracts/broadcast/Deploy.s.sol/10143/run-latest.json) |
+| Deploy record | [testnet](contracts/broadcast/Deploy.s.sol/10143/run-latest.json) · [mainnet](contracts/broadcast/Deploy.s.sol/143/run-latest.json) |
 
 ## Quick start
 

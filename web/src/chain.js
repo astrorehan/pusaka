@@ -1,12 +1,13 @@
-/* Koneksi ke blockchain: klien viem, alamat kontrak, dan kunci demo di browser. */
+/* Koneksi ke blockchain: klien viem, alamat kontrak, dan kunci demo di browser (pewaris, saksi, amplop).
+   Dompet induk dan operator mitra tidak ada di sini: kuncinya di server (relayer/), browser memanggil /api/induk. */
 import {
   createPublicClient, createWalletClient, http, getAddress, keccak256, encodePacked, encodeAbiParameters, concat, toHex,
   getContractAddress,
 } from 'viem';
 import { privateKeyToAccount, generatePrivateKey } from 'viem/accounts';
 import { anvil, monadTestnet } from 'viem/chains';
+import { env } from './env.js';
 
-const env = import.meta.env;
 export const LOKAL = (env.VITE_CHAIN || 'anvil') !== 'monad';
 export const chain = LOKAL ? anvil : monadTestnet;
 export const RPC = env.VITE_RPC || (LOKAL ? `${location.origin}/rpc` : monadTestnet.rpcUrls.default.http[0]);
@@ -46,14 +47,7 @@ const wajib = (nama) => {
 const opsional = (nama) => (env[nama] && !/^0x0{40}$/i.test(env[nama]) ? getAddress(env[nama]) : null);
 export const ALAMAT = { token: wajib('VITE_TOKEN'), wallet: wajib('VITE_WALLET'), factory: opsional('VITE_FACTORY'), mitra: wajib('VITE_MITRA') };
 
-/* Dompet induk: membagikan gas dan tIDR ke kunci demo, dan menjadi relayer (mengirim kabar hidup dan konfirmasi saksi
-   yang sudah ditandatangani, jadi pewaris dan saksi tidak membayar gas). Di anvil memakai akun bawaan nomor 0. */
-const KUNCI_ANVIL_0 = '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80';
-const kunciInduk = env.VITE_INDUK_KEY || (LOKAL ? KUNCI_ANVIL_0 : null);
-export const induk = kunciInduk ? privateKeyToAccount(kunciInduk) : null;
-/* Operator mitra pencairan (simulasi bank): kunci turunan dompet induk, supaya transaksinya tidak berebut nonce
-   dengan dompet induk. Didaftarkan sebagai operator oleh pemilik MitraCair saat "Bagikan gas". */
-export const operator = kunciInduk ? privateKeyToAccount(keccak256(concat([kunciInduk, toHex('pusaka-mitra-operator-v1')]))) : null;
+/* Ambang isi gas di browser; jumlah sebenarnya diatur server (GAS_MON). */
 export const GAS_MON = Number(env.VITE_GAS_MON || 0.2);
 /* Gas yang disponsori untuk tiap amplop digital, supaya ahli waris bisa mencairkan tanpa pernah membeli MON. */
 export const GAS_AMPLOP = Number(env.VITE_GAS_AMPLOP || 0.08);

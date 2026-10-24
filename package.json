@@ -1,0 +1,12 @@
+{
+  "name": "pusaka",
+  "private": true,
+  "type": "module",
+  "description": "Akar repo untuk Vercel: menyediakan viem untuk relayer/ (fungsi api/induk.js); situs Vite ada di web/",
+  "scripts": {
+    "build": "cd web && npm install && npm run build"
+  },
+  "dependencies": {
+    "viem": "^2.57.10"
+  }
+}

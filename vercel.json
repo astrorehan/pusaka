@@ -1,0 +1,6 @@
+{
+  "installCommand": "npm install",
+  "buildCommand": "npm run build",
+  "outputDirectory": "web/dist",
+  "functions": { "api/induk.js": { "maxDuration": 60 } }
+}

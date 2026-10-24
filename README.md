@@ -33,6 +33,7 @@ Dibuat di **Monad Blitz Jogja Vol. 2**, Sabtu 24 Oktober 2026, GIK UGM.
 | [`docs/penilaian.md`](docs/penilaian.md) | Kriteria penilaian Monad Blitz Jogja Vol. 2 |
 | [`contracts/`](contracts/README.md) | Kontrak Solidity (Foundry) |
 | [`web/`](web/README.md) | Aplikasi web (Vite + viem + GSAP): 9 layar yang tersambung ke kontrak |
+| [`relayer/`](docs/relayer-api.md) + `api/` | Relayer di server: dompet induk dan operator mitra (browser tidak memegang kuncinya). Fungsi Vercel `api/induk.js` |
 
 ## Menjalankan
 

@@ -76,8 +76,8 @@ if (alamat.VITE_MITRA) {
 
 console.log('Dompet induk (relayer, pembagi gas, pemilik MitraCair)');
 const KUNCI_ANVIL_0 = '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80';
-const kunci = env.VITE_INDUK_KEY || (LOKAL ? KUNCI_ANVIL_0 : null);
-if (!kunci) salah('VITE_INDUK_KEY belum diisi');
+const kunci = env.INDUK_KEY || env.VITE_INDUK_KEY || (LOKAL ? KUNCI_ANVIL_0 : null);
+if (!kunci) salah('INDUK_KEY (atau VITE_INDUK_KEY lama) belum diisi');
 else {
   const induk = privateKeyToAccount(kunci);
   const saldo = Number(formatEther(await pub.getBalance({ address: induk.address })));

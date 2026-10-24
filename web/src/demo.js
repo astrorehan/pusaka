@@ -11,17 +11,33 @@
    pasang · cabut · saksi · dipicu · batal · hidup · aktivitas · kabar · lewati · dibagikan · pencairan · qr · gas ·
    ulang · sinkron */
 import {
-  parseEther, formatEther, BaseError, ContractFunctionRevertedError, encodeFunctionData, parseSignature, keccak256, toHex,
+  parseEther, formatEther, BaseError, ContractFunctionRevertedError, encodeFunctionData, parseSignature,
   getAddress, isAddress, hashTypedData,
 } from 'viem';
 import { pusakaWalletAbi, mockIDRAbi, mitraCairAbi } from './abi.js';
 import * as Passkey from './passkey.js';
+import { env } from './env.js';
+import { Relayer } from './relayer.js';
 import {
-  pub, dompet, chain, ALAMAT, LOKAL, EXPLORER, induk, operator, GAS_MON, GAS_AMPLOP, BLOK_MS, akun, pewarisBaru,
+  pub, dompet, chain, ALAMAT, LOKAL, EXPLORER, GAS_MON, GAS_AMPLOP, BLOK_MS, akun, pewarisBaru,
   alamatPenerima, benihSendiri, kunciAmplop, sidikRekening, garamRekening, idRekening, alamatVA, aturImplRekening,
 } from './chain.js';
 
 const RP300 = parseEther('300000000'); // Rp300 jt tIDR (18 desimal)
+/* Dompet induk dan operator mitra ada di server (relayer/); kuncinya tidak pernah sampai ke browser. Di sini hanya
+   alamatnya, dari GET /api/induk: { address }, atau null bila relayer tidak terjangkau (layar lalu memakai jalur tanpa
+   relayer: saksi dan pewaris membayar gasnya sendiri). */
+let induk = null, operator = null;
+async function muatInfo() {
+  try {
+    const h = await Relayer.info();
+    induk = { address: h.induk };
+    operator = h.operator ? { address: h.operator } : null;
+  } catch (e) {
+    induk = null; operator = null;
+    console.warn('Relayer belum tersambung', e.message);
+  }
+}
 const AKTA_CONTOH = '0x9f2c41d07be3a95c2e1f8806d4b7a3c150e9f2ab64d18c37e5b2a0f91c6d4ab1';
 /* Batas gas eksplisit. Di Monad biaya dihitung dari batas gas, bukan gas terpakai, jadi batasnya dibuat dekat dengan
    pemakaian terukur di anvil mode Monad (`anvil --network monad`, GAS_LOG=1 node scripts/e2e.mjs) ditambah ±40%.
@@ -240,6 +256,7 @@ async function tarik() {
       // null = belum dibaca · false = bukan keluarga contoh (tidak dibaca ulang)
       if (sum.status > 0 && alamatTerpasang === null) alamatTerpasang = (await bacaAlamatTerpasang()) || false;
     }
+    if (!induk && putaran % 10 === 5) muatInfo(); // relayer sempat tidak terjangkau: coba lagi
     const ambilGas = milikSendiri() && (putaran % 3 === 0 || !mentah);
     putaran++;
     const st = sum ? Number(sum.status) : 0;
@@ -408,7 +425,7 @@ const sisaSanggah = (t = Date.now()) => (s.status === 2 ? Math.max(0, (s.trigger
 const sisaBatas = (t = Date.now()) => (s.status === 1 ? Math.max(0, (s.lastBeat + s.batas * 1000 - t) / 1000) : null);
 
 /* ---------- menulis ke kontrak ---------- */
-const antrean = new Map(); // satu akun hanya mengirim satu transaksi dalam satu waktu
+const antrean = new Map(); // satu akun di browser ini hanya mengirim satu transaksi dalam satu waktu
 function antre(a, kerja) {
   const sebelum = antrean.get(a.address) || Promise.resolve();
   const p = sebelum.catch(() => {}).then(kerja);
@@ -439,41 +456,16 @@ const PESAN_ERROR = {
 function pesanDari(e) {
   const nama = namaError(e);
   if (nama) return PESAN_ERROR[nama] || `Ditolak kontrak: ${nama}`;
+  if (e && e.kode && PESAN_ERROR[e.kode]) return PESAN_ERROR[e.kode]; // galat dari relayer membawa nama revert di `kode`
   const m = (e && (e.shortMessage || e.message)) || String(e);
   // e.message viem memuat baris "Details:" dari node, mis. "Signer had insufficient balance" di Monad.
   if (/insufficient funds|insufficient balance|exceeds the balance/i.test(`${m} ${e?.message || ''}`)) return 'Gas di dompet demo tidak cukup. Bagikan gas dulu.';
   return m.split('\n')[0];
 }
-/* Aturan "reserve balance" Monad: dompet bersaldo di bawah 10 MON hanya boleh mengurangi saldonya dengan mengirim MON
-   jika dalam 3 blok terakhir (±1,2 detik) ia tidak mengirim transaksi lain. Jika tidak, kirimannya dibatalkan di
-   blockchain (gas tetap terpakai). Karena itu dompet induk mengirim MON satu per satu dengan jeda, dan mencoba ulang
-   bila tetap dibatalkan (mis. relayer di perangkat lain baru saja mengirim). Anvil tidak punya aturan ini.
-   Dipanggil di dalam antre(induk). */
-let blokIndukTerakhir = 0n;
-const JEDA_BLOK_MON = 4n;
-async function kirimMON(to, value) {
-  for (let coba = 0; ; coba++) {
-    if (!LOKAL && blokIndukTerakhir) {
-      while ((await pub.getBlockNumber({ cacheTime: 0 })) < blokIndukTerakhir + JEDA_BLOK_MON) await new Promise((r) => setTimeout(r, BLOK_MS));
-    }
-    // Dompet pewaris yang sudah memakai EIP-7702 punya kode, jadi menerima MON butuh sedikit di atas 21.000 gas.
-    const perkiraan = await pub.estimateGas({ account: induk, to, value }).catch(() => 60_000n);
-    const tx = await dompet(induk).sendTransaction({ to, value, gas: perkiraan === 21_000n ? perkiraan : perkiraan + perkiraan / 5n });
-    const r = await pub.waitForTransactionReceipt({ hash: tx });
-    if (r.blockNumber > blokIndukTerakhir) blokIndukTerakhir = r.blockNumber;
-    if (r.status === 'success') {
-      // Monad memeriksa saldo pengirim memakai keadaan ±3 blok lalu, jadi penerima baru bisa memakai MON ini setelahnya.
-      if (!LOKAL) while ((await pub.getBlockNumber({ cacheTime: 0 })) < r.blockNumber + JEDA_BLOK_MON) await new Promise((x) => setTimeout(x, BLOK_MS));
-      return tx;
-    }
-    if (LOKAL || coba >= 2) throw new Error('Kiriman MON dari dompet induk dibatalkan di blockchain.');
-  }
-}
+/* Kirim satu panggilan kontrak dari kunci di browser ini (pewaris atau amplop): simulasi dulu (agar penolakan terbaca
+   jelas dan tidak membuang gas), lalu kirim dengan batas gas eksplisit. Di Monad biaya dihitung dari batas gas, bukan
+   gas terpakai. Jika nonce bentrok dengan tab lain yang memakai akun yang sama, dicoba ulang dengan nonce baru. */
 const nonceBentrok = (e) => /nonce|already known|replacement transaction|underpriced/i.test((e && (e.shortMessage || e.message)) || '');
-
-/* Kirim satu panggilan kontrak: simulasi dulu (agar penolakan terbaca jelas dan tidak membuang gas), lalu kirim
-   dengan batas gas eksplisit. Di Monad biaya dihitung dari batas gas, bukan gas terpakai. Jika nonce bentrok dengan
-   tab lain yang memakai akun yang sama (mis. relayer), dicoba ulang dengan nonce baru. */
 async function kirim(a, req, sebab) {
   return antre(a, async () => {
     const t0 = performance.now();
@@ -487,14 +479,23 @@ async function kirim(a, req, sebab) {
     }
     umumkanTx(sebab, tx);
     const r = await pub.waitForTransactionReceipt({ hash: tx });
-    if (a === induk && r.blockNumber > blokIndukTerakhir) blokIndukTerakhir = r.blockNumber;
     if (r.status !== 'success') throw new Error('Transaksi gagal dijalankan di blockchain.');
-    const hasil = { tx, blok: Number(r.blockNumber), detik: (performance.now() - t0) / 1000, gas: Number(r.gasUsed) };
-    finalTerakhir[sebab] = hasil;
-    bc && bc.postMessage({ jenis: 'final', sebab, hasil });
-    try { struk(sebab, hasil); } catch (e) { console.warn('struk', e); }
-    return hasil;
+    return selesai(sebab, { tx, blok: Number(r.blockNumber), detik: (performance.now() - t0) / 1000, gas: Number(r.gasUsed) });
   });
+}
+/* Transaksi yang dikirim relayer (server) atas nama pewaris, saksi, atau siapa pun: kabar hidup, konfirmasi saksi,
+   pemicu tidak aktif, pembagian. Browser tidak memegang kunci pengirimnya, jadi cukup meminta /api/induk. */
+async function relay(sebab, fungsi, args, gas) {
+  const h = await Relayer.relay({ pewaris: P, fungsi, args, gas });
+  umumkanTx(sebab, h.tx);
+  return selesai(sebab, { tx: h.tx, blok: h.blok, detik: h.detik, gas: h.gas });
+}
+/* Struk dan "Final di blok …" untuk transaksi yang baru selesai. */
+function selesai(sebab, hasil) {
+  finalTerakhir[sebab] = hasil;
+  bc && bc.postMessage({ jenis: 'final', sebab, hasil });
+  try { struk(sebab, hasil); } catch (e) { console.warn('struk', e); }
+  return hasil;
 }
 async function jalankan(nama, kerja) {
   try {
@@ -519,50 +520,20 @@ const TIPE_KABAR = { KabarHidup: [{ name: 'pesan', type: 'string' }, { name: 'wa
 const TIPE_KONFIRMASI = { KonfirmasiWafat: [{ name: 'saksi', type: 'address' }, { name: 'bukti', type: 'bytes32' }, { name: 'putaran', type: 'uint256' }] };
 const TIPE_IZIN = { Permit: [{ name: 'owner', type: 'address' }, { name: 'spender', type: 'address' }, { name: 'value', type: 'uint256' }, { name: 'nonce', type: 'uint256' }, { name: 'deadline', type: 'uint256' }] };
 
-/* "Bagikan gas": dompet induk mengirim MON ke kunci yang perlu mengirim transaksi sendiri (pewaris, amplop, operator
-   mitra), mendaftarkan operator mitra, dan mengisi tIDR pewaris. Saksi tidak perlu gas: tanda tangannya dikirim relayer. */
+/* "Bagikan gas": relayer (server) mengirim MON ke kunci yang perlu mengirim transaksi sendiri (pewaris, amplop, operator
+   mitra), mendaftarkan operator mitra, dan mengisi tIDR pewaris. Saksi tidak perlu gas: tanda tangannya dikirim relayer.
+   Jumlah MON dan pemeriksaan saldo ada di server (aksi gas); di sini hanya memilih siapa yang perlu diisi. */
 async function isiDompetDemo({ tidr: isiTidr = true, hanyaPewaris = false } = {}) {
-  if (!induk) throw new Error('Dompet induk belum diatur (VITE_INDUK_KEY).');
-  const target = parseEther(String(GAS_MON));
+  if (!induk) throw new Error('Relayer belum tersambung (/api/induk). Dompet induk ada di server.');
   const f = bacaAturan();
-  const amplop = benih && !hanyaPewaris ? ID_PENERIMA.filter((id) => terimaDari(f, KEY_PENERIMA[id]).cara !== 'bank').map((id) => kunciAmplop(benih, KEY_PENERIMA[id])) : [];
-  // Operator menyapu dan menyelesaikan banyak transfer per putaran (±0,15 MON di Monad), jadi jatahnya 1,5×.
-  const daftar = [[akun.pewaris, target], ...(operator && !hanyaPewaris ? [[operator, (target * 3n) / 2n]] : []), ...amplop.map((a) => [a, parseEther(String(GAS_AMPLOP))])];
-  const saldo = await Promise.all(daftar.map(([a]) => pub.getBalance({ address: a.address })));
-  const kurang = daftar.map(([a, t], i) => [a, t, saldo[i]]).filter(([, t, b]) => b < t / 2n);
-  const tidr = await saldoToken(akun.pewaris.address);
-  const perluTidr = isiTidr && tidr < RP300 && milikSendiri() && s.status <= 1;
-  let perluOperator = false;
-  if (operator) {
-    const [aktif, pemilik] = await Promise.all([bacaMitra('isOperator', [operator.address]), bacaMitra('pemilik')]);
-    perluOperator = !aktif && pemilik.toLowerCase() === induk.address.toLowerCase();
-  }
-  if (!kurang.length && !perluTidr && !perluOperator) return;
-  return antre(induk, async () => {
-    // Kiriman MON satu per satu (lihat kirimMON), lalu panggilan kontrak tanpa MON boleh beruntun.
-    let gagalPewaris = null;
-    for (const [a, t, b] of kurang) {
-      try { await kirimMON(a.address, t - b); } catch (e) {
-        if (a === akun.pewaris) gagalPewaris = e;
-        console.warn('gas tidak terkirim ke', a.address, pesanDari(e)); // penerima lain tetap diisi
-      }
-    }
-    if (gagalPewaris) throw gagalPewaris;
-    const w = dompet(induk);
-    let nonce = await pub.getTransactionCount({ address: induk.address, blockTag: 'pending' });
-    const tx = [];
-    if (perluTidr) {
-      tx.push(await w.writeContract({ address: ALAMAT.token, abi: mockIDRAbi, functionName: 'faucet', args: [akun.pewaris.address, RP300 - tidr], gas: GAS.faucet, nonce: nonce++ }));
-    }
-    if (perluOperator) {
-      tx.push(await w.writeContract({ address: ALAMAT.mitra, abi: mitraCairAbi, functionName: 'aturOperator', args: [operator.address, true], gas: GAS.operator, nonce: nonce++ }));
-    }
-    const rs = await Promise.all(tx.map((hash) => pub.waitForTransactionReceipt({ hash })));
-    rs.forEach((r) => { if (r.blockNumber > blokIndukTerakhir) blokIndukTerakhir = r.blockNumber; });
-  });
+  // Server membatasi 6 amplop; sisanya diisi saat dicairkan (aksi amplop).
+  const amplop = benih && !hanyaPewaris
+    ? ID_PENERIMA.filter((id) => terimaDari(f, KEY_PENERIMA[id]).cara !== 'bank').map((id) => kunciAmplop(benih, KEY_PENERIMA[id]).address).slice(0, 6)
+    : [];
+  await Relayer.gas({ pewaris: akun.pewaris.address, amplop, tidr: isiTidr && milikSendiri() && s.status <= 1, hanyaPewaris });
 }
 
-/* Akun yang mengirim transaksi atas nama orang lain (kabar hidup, konfirmasi saksi). Di produk: relayer Pusaka. */
+/* Ada relayer yang mengirim transaksi atas nama orang lain (kabar hidup, konfirmasi saksi)? Di produk: relayer Pusaka. */
 const relayer = () => induk;
 const WARUNG = '0x000000000000000000000000000000000000b0b1'; // penerima pembayaran contoh
 
@@ -577,7 +548,7 @@ const aksi = {
     return jalankan('pasang', async () => {
       const a = akun.pewaris;
       const [gas, tidr] = await Promise.all([pub.getBalance({ address: a.address }), saldoToken(a.address)]);
-      // Pewaris diisi dulu; amplop dan operator diisi di belakang (kiriman MON berjeda, lihat kirimMON).
+      // Pewaris diisi dulu; amplop dan operator diisi di belakang (kiriman MON berjeda, diatur relayer).
       if (gas < parseEther(String(GAS_MON)) / 2n || tidr < RP300) { onStatus('gas'); await isiDompetDemo({ hanyaPewaris: true }); }
       isiDompetDemo().catch((e) => console.warn('gas amplop/operator', e));
       const { setup, rekening } = argsSetup(f, a.address);
@@ -620,7 +591,7 @@ const aksi = {
       if (r) {
         const sum = await baca('getSummary');
         const ttd = await dompet(w).signTypedData({ domain: domainPusaka(), types: TIPE_KONFIRMASI, primaryType: 'KonfirmasiWafat', message: { saksi: w.address, bukti, putaran: sum.round } });
-        hasil = await kirim(r, { address: P, abi: pusakaWalletAbi, functionName: 'attestDeathFor', args: [w.address, bukti, ttd], gas: GAS.saksi }, 'saksi' + i);
+        hasil = await relay('saksi' + i, 'attestDeathFor', [w.address, bukti, ttd], GAS.saksi);
         hasil.relayer = true;
       } else {
         hasil = await kirim(w, { address: P, abi: pusakaWalletAbi, functionName: 'attestDeath', args: [bukti], gas: GAS.saksiLangsung }, 'saksi' + i);
@@ -631,10 +602,10 @@ const aksi = {
       return hasil;
     });
   },
-  /* triggerByInactivity(): siapa pun, setelah batas tidak aktif terlewati. Dikirim dari dompet induk. */
+  /* triggerByInactivity(): siapa pun, setelah batas tidak aktif terlewati. Dikirim relayer. */
   async picu() {
     if (s.status !== 1) return null;
-    return jalankan('picu', () => kirim(induk, { address: P, abi: pusakaWalletAbi, functionName: 'triggerByInactivity', gas: GAS.picu }, 'dipicu'));
+    return jalankan('picu', () => relay('dipicu', 'triggerByInactivity', [], GAS.picu));
   },
   /* Kabar hidup: pewaris hanya menandatangani (tanpa gas), relayer mengirim checkIn(). Saat masa sanggah, ini
      membatalkan pemicu. Waktunya dibuat lebih baru dari bukti hidup terakhir (jam blok beresolusi 1 detik). */
@@ -654,12 +625,12 @@ const aksi = {
         sidik.sibuk = true;
         let auth;
         try { auth = await Passkey.tandatangani(pk.id, hashTypedData(pesan)); } finally { sidik.sibuk = false; }
-        const hasil = await kirim(r, { address: P, abi: pusakaWalletAbi, functionName: 'checkInPasskey', args: [BigInt(t), auth], gas: GAS.sidikKabar }, sebab);
+        const hasil = await relay(sebab, 'checkInPasskey', [BigInt(t), auth], GAS.sidikKabar);
         hasil.relayer = true; hasil.sidikJari = true;
         return hasil;
       }
       const ttd = await dompet(akun.pewaris).signTypedData(pesan);
-      const hasil = await kirim(r, { address: P, abi: pusakaWalletAbi, functionName: 'checkIn', args: [BigInt(t), ttd], gas: GAS.kabar }, sebab);
+      const hasil = await relay(sebab, 'checkIn', [BigInt(t), ttd], GAS.kabar);
       hasil.relayer = true;
       return hasil;
     });
@@ -711,13 +682,8 @@ const aksi = {
       const data = encodeFunctionData({ abi: mockIDRAbi, functionName: 'transfer', args: [ke, parseEther(String(jumlah))] });
       const hasil = await kirim(akun.pewaris, { address: P, abi: pusakaWalletAbi, functionName: 'execute', args: [[{ to: ALAMAT.token, value: 0n, data }]], gas: GAS.bayar }, sebab);
       if (induk) {
-        const sisa = await saldoToken(P);
-        if (sisa < RP300) {
-          await antre(induk, async () => {
-            const tx = await dompet(induk).writeContract({ address: ALAMAT.token, abi: mockIDRAbi, functionName: 'faucet', args: [P, RP300 - sisa], gas: GAS.faucet });
-            await pub.waitForTransactionReceipt({ hash: tx });
-          });
-        }
+        // Saldo diisi ulang oleh relayer; kalau gagal, pembayarannya sendiri tetap berhasil.
+        try { await Relayer.faucet({ pewaris: P }); } catch (e) { console.warn('isi ulang tIDR', e.message); }
       }
       return hasil;
     });
@@ -750,12 +716,12 @@ const aksi = {
   async bagikan() {
     if (s.status !== 2 || sisaSanggah() > 0) return null;
     const hasil = await jalankan('bagikan', async () => {
-      const h = await kirim(induk, { address: P, abi: pusakaWalletAbi, functionName: 'finalize', gas: GAS.bagikan }, 'dibagikan');
+      const h = await relay('dibagikan', 'finalize', [], GAS.bagikan);
       blokDibagikan = h.blok;
       labelBankDibaca = false;
       return h;
     });
-    if (hasil) detakOperator(); // mitra langsung menyapu rekening virtual
+    if (hasil) detakOperator(true); // mitra langsung menyapu rekening virtual
     return hasil;
   },
   /* Ahli waris membuka amplop di HP-nya dan mencairkan ke rekening bank atau e-wallet. Satu transaksi dari kunci
@@ -771,11 +737,11 @@ const aksi = {
         pub.readContract({ address: ALAMAT.token, abi: mockIDRAbi, functionName: 'nonces', args: [a.address] }),
       ]);
       if (jumlah === 0n) throw new Error('Amplop ini sudah kosong.');
-      // Di Monad biaya dihitung dari batas gas, jadi amplop diisi sampai GAS_AMPLOP penuh sebelum mencairkan.
+      // Di Monad biaya dihitung dari batas gas, jadi amplop diisi sampai GAS_AMPLOP penuh sebelum mencairkan (oleh relayer).
       const targetAmplop = parseEther(String(GAS_AMPLOP));
       if (gas < (targetAmplop * 9n) / 10n) {
         if (!induk) throw new Error('Gas amplop belum disponsori.');
-        await antre(induk, () => kirimMON(a.address, targetAmplop - gas));
+        await Relayer.amplop({ alamat: a.address });
       }
       const deadline = BigInt(sekarangKontrak() + 3600);
       const ttd = await dompet(a).signTypedData({
@@ -863,7 +829,7 @@ function amplopUntuk(id) {
 }
 /* Tautan untuk QR Panggung atau pesan WhatsApp. Benih di bagian # tidak pernah dikirim ke server. */
 function urlAmplop(id) {
-  const base = (import.meta.env.VITE_PUBLIC_URL || location.origin).replace(/\/$/, '');
+  const base = (env.VITE_PUBLIC_URL || location.origin).replace(/\/$/, '');
   return `${base}/waris.html?p=${P}${id ? `&id=${id}` : ''}${benih ? `#s=${benih}` : ''}`;
 }
 /* Cara terima satu penerima, untuk layar mana pun. Di laptop pewaris: dari aturan. Di perangkat lain: rekening
@@ -887,7 +853,8 @@ function caraTerima(id) {
 }
 
 /* ---------- operator mitra pencairan (simulasi bank) ----------
-   Berjalan di laptop presenter saja (Panggung, Pewaris, Saksi, Mitra, Simulasi HP), satu tab sebagai pemimpin.
+   Kuncinya di server: layar presenter (Panggung, Pewaris, Saksi, Mitra, Simulasi HP) hanya memanggil aksi `mitra`
+   secara berkala, satu tab sebagai pemimpin. Server mengerjakan:
    1. Rekening virtual yang berisi disapu ke mitra (sapuBanyak).
    2. Pencairan yang diproses "ditransfer lewat BI-FAST" ±1,4 detik, lalu dicatat selesai dengan nomor referensi. */
 const HALAMAN_OPERATOR = /(panggung|pewaris|saksi|mitra|hp|index)\.html$|\/$/;
@@ -901,56 +868,36 @@ function pemimpin() {
     return false;
   } catch { return true; }
 }
-let operatorSibuk = false, operatorSiap = null, detakKe = 0;
-const sudahDiproses = new Map(); // no → waktu mulai "transfer bank"
+let operatorSibuk = false, detakKe = 0, bankMenunggu = 0;
 const mitraLog = [];
 const catatMitra = (teks, tx = '') => { mitraLog.push({ t: Date.now(), teks, tx }); if (mitraLog.length > 40) mitraLog.shift(); };
-const DELAY_BANK = 1400;
 /* Untuk pewaris yang sedang dipantau, isi rekening virtual dan antrean pencairan sudah terbaca oleh tarik()
-   (statusBanyak), jadi operator tidak perlu panggilan tambahan. Pemindaian penuh hanya tiap ±10 detik. */
+   (statusBanyak), jadi server dipanggil hanya jika ada yang perlu dikerjakan. Pemindaian penuh hanya tiap ±10 detik. */
 async function detakOperator(paksa = false) {
   if (!bolehOperator() || operatorSibuk) return;
   if (!paksa && !pemimpin()) return;
   const penuh = paksa || detakKe++ % 10 === 0;
   const pen = Object.values(s.penerima);
-  const vaLokal = pen.filter((p) => p.rekening && p.saldo > 0).map((p) => p.rekening);
-  const antreLokal = pen.filter((p) => p.cair && p.cair.tahap === 'diproses').map((p) => BigInt(p.cair.no));
-  if (!penuh && !vaLokal.length && !antreLokal.length && !sudahDiproses.size) return;
+  const adaVa = pen.some((p) => p.rekening && p.saldo > 0);
+  const adaAntre = pen.some((p) => p.cair && p.cair.tahap === 'diproses');
+  if (!penuh && !adaVa && !adaAntre && !bankMenunggu) return;
   operatorSibuk = true;
   try {
-    if (operatorSiap === null) operatorSiap = await bacaMitra('isOperator', [operator.address]);
-    if (!operatorSiap) { operatorSiap = null; return; }
-    let berisi = vaLokal, antre = antreLokal;
-    if (penuh) {
-      const n = await bacaMitra('jumlahRekening');
-      [berisi, antre] = await Promise.all([n > 0n ? bacaMitra('vaBerisi', [0n, n]) : Promise.resolve([]), bacaMitra('antrean')]);
+    const h = await Relayer.mitra();
+    bankMenunggu = h.menunggu || 0;
+    (h.catatan || []).forEach((c) => catatMitra(c.teks, c.tx));
+    if (h.tx && h.tx.length) {
+      const akhir = h.hasil[h.hasil.length - 1];
+      umumkanTx('mitra', akhir.tx);
+      selesai('mitra', akhir);
     }
-    if (berisi.length) {
-      const ids = berisi.slice(0, 20);
-      const hasil = await kirim(operator, { address: ALAMAT.mitra, abi: mitraCairAbi, functionName: 'sapuBanyak', args: [ids], gas: GAS.sapuPer * BigInt(ids.length) + 80_000n }, 'mitra');
-      catatMitra(`${ids.length} rekening virtual disapu ke mitra`, hasil.tx);
-    }
-    const sekarang = Date.now();
-    antre.forEach((no) => { const k = Number(no); if (!sudahDiproses.has(k)) sudahDiproses.set(k, sekarang); });
-    const siap = antre.filter((no) => sekarang - sudahDiproses.get(Number(no)) >= DELAY_BANK);
-    // yang sudah tidak ada di antrean (selesai di tab lain) dilupakan
-    const masih = new Set(antre.map(Number));
-    [...sudahDiproses.keys()].forEach((k) => { if (!masih.has(k) && penuh) sudahDiproses.delete(k); });
-    if (siap.length) {
-      siap.forEach((no) => sudahDiproses.delete(Number(no)));
-      const bukti = siap.map((no) => keccak256(toHex(`BIFAST|${chain.id}|${no}|${sekarang}`)));
-      const hasil = await kirim(operator, {
-        address: ALAMAT.mitra, abi: mitraCairAbi, functionName: 'selesaikan', args: [siap, bukti],
-        gas: GAS.selesaikanPer * BigInt(siap.length) + 90_000n,
-      }, 'mitra');
-      catatMitra(`${siap.length} transfer bank selesai (simulasi BI-FAST)`, hasil.tx);
+    if ((h.catatan || []).some((c) => c.jenis === 'selesai')) {
       bc && bc.postMessage({ jenis: 'segarkan' });
       labelBankDibaca = false;
       tarik();
     }
   } catch (e) {
     console.warn('operator mitra', pesanDari(e));
-    operatorSiap = null;
   } finally {
     operatorSibuk = false;
   }
@@ -1113,6 +1060,7 @@ function panel({ judul = 'Panel demo', aksiStatus = true } = {}) {
    Monad membatasi ±25 panggilan per detik per IP. */
 const INTERVAL = /panggung/.test(location.pathname) ? 500 : /waris|hp|kabar/.test(location.pathname) ? (milikSendiri() ? 1500 : 2000) : 1000;
 export async function siapkan() {
+  await muatInfo();
   try { aturImplRekening(await bacaMitra('rekeningImpl')); } catch (e) { console.warn('MitraCair tidak terbaca', e); }
   perbaruiAlamat();
   await nominalDariKontrak();
@@ -1137,11 +1085,14 @@ window.Demo = {
     return f ? `Final di blok ${blokN} dalam ${Math.max(0.1, f.detik).toLocaleString('id-ID', { maximumFractionDigits: 1 })} detik` : `Final di blok ${blokN}`;
   },
   hasilTerakhir: (sebab) => finalTerakhir[sebab] || null,
-  PUBLIC_URL: (import.meta.env.VITE_PUBLIC_URL || location.origin).replace(/\/$/, ''),
+  PUBLIC_URL: (env.VITE_PUBLIC_URL || location.origin).replace(/\/$/, ''),
   NAMA_JARINGAN: LOKAL ? 'blockchain lokal (anvil)' : 'Monad testnet',
   get milikSendiri() { return milikSendiri(); },
   alamatPenerima: (key) => alamatPenerima(P, key),
-  alamat: ALAMAT, LOKAL, EXPLORER, akun, induk, operator,
+  alamat: ALAMAT, LOKAL, EXPLORER, akun,
+  /* alamat dompet induk dan operator mitra dari relayer ({ address }), atau null; kuncinya hanya ada di server */
+  get induk() { return induk; },
+  get operator() { return operator; },
   sekarangKontrak,
   /* cara terima, bukti hidup, sidik jari */
   KEY_PENERIMA, ID_PENERIMA, BANK, EWALLET, TERIMA_AWAL, AWAL_ATURAN, bacaAturan, simpanAturan, terimaDari,

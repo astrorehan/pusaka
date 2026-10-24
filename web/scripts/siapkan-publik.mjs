@@ -1,4 +1,5 @@
-/* Menyiapkan dompet induk terpisah untuk build publik (kuncinya ikut terbawa ke browser).
+/* Menyiapkan dompet induk terpisah bersaldo kecil untuk situs publik. Kuncinya hanya dipakai server relayer
+   (isi INDUK_KEY di Vercel dengan nilai ini); browser tidak pernah memegangnya.
    - Membuat kunci baru di .env.publik.local (salinan .env.monad.local dengan VITE_INDUK_KEY baru), jika belum ada.
    - Dompet induk utama (VITE_INDUK_KEY di .env.monad.local, pemilik MitraCair) mengirim MON ke induk publik
      dan mendaftarkan operator mitra milik induk publik.
@@ -22,7 +23,7 @@ if (!fs.existsSync(TUJUAN)) {
   const isi = fs.readFileSync(SUMBER, 'utf8')
     .replace(/^VITE_INDUK_KEY=.*$/m, `VITE_INDUK_KEY=${generatePrivateKey()}`)
     .replace(/^VITE_PUBLIC_URL=.*$/m, `VITE_PUBLIC_URL=${URL}`)
-    .replace(/^# Isi sendiri: private key dompet induk.*$/m, '# Dompet induk PUBLIK (saldo kecil). Kuncinya ikut terbawa ke browser.');
+    .replace(/^# Isi sendiri: private key dompet induk.*$/m, '# Dompet induk PUBLIK (saldo kecil). Kunci ini untuk server relayer (INDUK_KEY di Vercel), bukan untuk browser.');
   fs.writeFileSync(TUJUAN, isi);
   console.log(`dibuat ${TUJUAN}`);
 }

@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='4' fill='%23131b33'/%3E%3Crect x='4.5' y='4.5' width='15' height='15' fill='none' stroke='%23f5efe3' stroke-width='1.4'/%3E%3Cpath d='M8 19.5 12.4 4.5M12 19.5 16.3 4.5' stroke='%23f5efe3' stroke-width='1.4'/%3E%3C/svg%3E">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Simulasi HP — Pusaka</title>
+<link rel="stylesheet" href="assets/fonts.css">
+<link rel="stylesheet" href="assets/tokens.css">
+<link rel="stylesheet" href="assets/base.css">
+<style>
+  body { background: var(--bg-deep); }
+  header { padding: 18px 32px 0; display: flex; gap: 6px 24px; align-items: baseline; flex-wrap: wrap; }
+  header h1 { font: 400 26px/1.1 var(--font-serif); }
+  header p { color: var(--text-3); font-size: 14.5px; max-width: 64em; }
+  header kbd { font: inherit; padding: 0 5px; border: 1px solid var(--line-2); border-radius: 3px; color: var(--text-2); }
+  /* --k dihitung di skrip agar empat HP muat satu layar (maksimal 1); makin sempit: 2 kolom, lalu 1 kolom */
+  .deret { --k: 1; display: grid; grid-template-columns: repeat(4, max-content); justify-content: center; gap: 26px 28px; padding: 18px 24px 56px; }
+  .hp { width: calc(390px * var(--k) + 20px); }
+  .hp select { display: block; width: 100%; margin-bottom: 10px; background: transparent; color: var(--text-2); border: 1px solid var(--line-2); height: 34px; padding: 0 8px; font-size: 13.5px; }
+  .hp select option { background: var(--nila-850); }
+  .hp .bingkai { width: calc(390px * var(--k) + 20px); height: calc(844px * var(--k) + 20px); border: 10px solid #070b16; border-radius: 46px; overflow: hidden; background: var(--bg); box-shadow: 0 0 0 1px rgb(255 255 255 / .08), 0 40px 70px -30px #000; }
+  .hp iframe { width: 390px; height: 844px; border: 0; transform: scale(var(--k)); transform-origin: 0 0; display: block; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Simulasi HP</h1>
+  <p>Empat HP berdampingan: HP pewaris dan HP ahli waris. Pilih peran tiap HP di atas bingkainya; pilihan diingat di browser ini. Statusnya ikut berubah saat kamu memakai panel demo (tab kecil di kiri bawah, atau tombol <kbd>`</kbd>), layar Saksi, atau layar Panggung yang terbuka di tab lain.</p>
+</header>
+<div class="deret" id="deret"></div>
+<script type="module">
+import '/src/boot.js';
+const D = Pusaka, S = Demo;
+const deret = document.getElementById('deret');
+const diam = new URLSearchParams(location.search).has('diam') ? 'diam=1' : '';
+
+/* ---------- peran ---------- */
+const AWAL = ['kabar', 'istri', 'putra1', 'putra2'];
+const KUNCI = 'pusaka-hp-peran';
+const CARA = { bank: 'rekening bank', amplop: 'amplop WhatsApp', kripto: 'dompet kripto' };
+const IDS = ['kabar', ...S.ID_PENERIMA];
+function label(id) {
+  if (id === 'kabar') return `HP ${D.pewaris.nama} (pewaris)`;
+  const c = S.caraTerima(id);
+  return `${D.PERAN_PANJANG[id] || id}${c && CARA[c.cara] ? ` · ${CARA[c.cara]}` : ''}`;
+}
+const urlHP = (id) => (id === 'kabar'
+  ? `kabar.html${diam ? `?${diam}` : ''}`
+  : `waris.html?id=${id}${diam ? `&${diam}` : ''}`);
+
+let simpan = [];
+try { const j = JSON.parse(localStorage.getItem(KUNCI)); if (Array.isArray(j)) simpan = j; } catch {}
+const simpanKe = () => { try { localStorage.setItem(KUNCI, JSON.stringify([...deret.querySelectorAll('select')].map((x) => x.value))); } catch {} };
+
+const pilihan = [];
+AWAL.forEach((awal, i) => {
+  const id = IDS.includes(simpan[i]) ? simpan[i] : awal;
+  const d = document.createElement('div');
+  d.className = 'hp';
+  d.innerHTML = `<select aria-label="Peran di HP ke-${i + 1}">${IDS.map((v) => `<option value="${v}"></option>`).join('')}</select>
+    <div class="bingkai"><iframe loading="eager"></iframe></div>`;
+  const sel = d.querySelector('select'), f = d.querySelector('iframe');
+  sel.value = id;
+  const muat = () => { f.title = label(sel.value); f.src = urlHP(sel.value); };
+  sel.onchange = () => { simpanKe(); muat(); };
+  pilihan.push(sel);
+  deret.appendChild(d);
+  muat();
+});
+
+/* Teks pilihan ikut cara terima yang berlaku (bank, amplop, atau dompet kripto). */
+function segarkanLabel() {
+  pilihan.forEach((sel) => [...sel.options].forEach((o) => { const t = label(o.value); if (o.textContent !== t) o.textContent = t; }));
+}
+segarkanLabel();
+S.on(segarkanLabel);
+
+/* ---------- ukuran: empat HP di satu layar (maksimal skala 1), makin sempit 2 kolom lalu 1 kolom ---------- */
+function atur() {
+  const cs = getComputedStyle(deret);
+  const sisi = parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight);
+  const celah = parseFloat(cs.columnGap) || 28;
+  const lebar = document.documentElement.clientWidth;
+  const kLebar = (n) => (lebar - sisi - (n - 1) * celah - n * 20) / (n * 390);
+  const dipakai = 18 + pilihan[0].offsetHeight + 10 + 20 + 24;       // padding atas, pilihan, bingkai, ruang bawah
+  const kTinggi = (innerHeight - deret.offsetTop - dipakai) / 844;
+  let n = 4, k = Math.min(1, kLebar(4), kTinggi);
+  if (k < 0.6) { n = 2; k = Math.min(1, kLebar(2)); }
+  if (k < 0.5) { n = 1; k = Math.min(1, kLebar(1)); }
+  deret.style.setProperty('--k', Math.max(0.3, k).toFixed(3));
+  deret.style.gridTemplateColumns = `repeat(${n}, max-content)`;
+}
+atur();
+addEventListener('resize', atur);
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(atur);
+
+Demo.panel({ judul: 'Panel demo' });
+</script>
+</body>
+</html>

@@ -1,0 +1,5 @@
+/* Gambetta (serif, judul dan angka besar) + Ranade (sans, teks dan kontrol), dari Fontshare.
+   Noto Sans Javanese hanya untuk aksara ꦥꦸꦱꦏ di merek.
+   Di aplikasi final, unduh woff2-nya dan host sendiri (lihat catatan implementasi). */
+@import url('https://api.fontshare.com/v2/css?f[]=gambetta@400,500,600,400i,500i&f[]=ranade@400,500,700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Javanese:wght@400;600&display=swap');

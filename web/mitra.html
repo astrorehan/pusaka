@@ -1,0 +1,429 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='4' fill='%23131b33'/%3E%3Crect x='4.5' y='4.5' width='15' height='15' fill='none' stroke='%23f5efe3' stroke-width='1.4'/%3E%3Cpath d='M8 19.5 12.4 4.5M12 19.5 16.3 4.5' stroke='%23f5efe3' stroke-width='1.4'/%3E%3C/svg%3E">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#131b33">
+<title>Mitra pencairan — Pusaka</title>
+<link rel="stylesheet" href="assets/fonts.css">
+<link rel="stylesheet" href="assets/tokens.css">
+<link rel="stylesheet" href="assets/base.css">
+<style>
+  main { max-width: 1560px; margin: 0 auto; padding: 0 var(--gutter) 96px; }
+  .atas { max-width: 1560px; margin: 0 auto; }
+
+  /* Kepala: judul di kiri, angka hidup di kanan */
+  .kepala { padding-top: 18px; display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 28px 56px; align-items: start; }
+  .kepala h1 { font: 400 clamp(32px, 3.2vw, 46px)/1.05 var(--font-serif); letter-spacing: -.012em; margin-top: 12px; }
+  .kepala .t-lead { margin-top: 12px; font-size: 17.5px; max-width: 34em; }
+  .kepala .peringatan { margin-top: 16px; display: inline-block; font-size: 14px; color: var(--text-2); }
+  .deret { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: 28px; }
+  .stat { padding: 12px 0 14px; border-top: 1px solid var(--line); min-width: 0; }
+  .stat dt { font-size: 13.5px; color: var(--text-3); }
+  .stat .n { font: 400 clamp(26px, 2.3vw, 34px)/1.1 var(--font-serif); margin-top: 2px; font-variant-numeric: tabular-nums lining-nums; white-space: nowrap; }
+  .stat .sebab { font-size: 13px; color: var(--text-3); line-height: 1.4; margin-top: 5px; }
+
+  /* Diagram alur: dua jalur masuk ke satu mitra */
+  .alur-wrap { margin-top: 34px; }
+  .alur-wrap h2 { font: 400 23px/1.2 var(--font-serif); }
+  .alur-wrap > p { margin-top: 4px; color: var(--text-3); font-size: 14.5px; }
+  .alur {
+    margin-top: 16px; display: grid; align-items: stretch;
+    grid-template-columns: minmax(0, 1fr) 56px minmax(0, 1fr) 56px minmax(0, 1.1fr) 56px minmax(0, 1fr) 56px minmax(0, 1fr);
+    grid-template-rows: auto auto auto auto; column-gap: 0; row-gap: 8px;
+  }
+  .jalur-label { font-size: 13px; color: var(--text-3); letter-spacing: .01em; align-self: end; padding-top: 2px; line-height: 1.3; }
+  .jalur-label b { font-weight: 500; color: var(--text-2); }
+  .jl1 { grid-area: 1 / 1 / 2 / 4; } .jl2 { grid-area: 3 / 1 / 4 / 4; }
+  .s1 { grid-area: 2 / 1; } .c1 { grid-area: 2 / 2; } .s2 { grid-area: 2 / 3; } .c2 { grid-area: 2 / 4; }
+  .a1 { grid-area: 4 / 1; } .ca { grid-area: 4 / 2; } .a2 { grid-area: 4 / 3; } .cb { grid-area: 4 / 4; }
+  .s3 { grid-area: 1 / 5 / 5 / 6; } .c3 { grid-area: 1 / 6 / 5 / 7; } .s4 { grid-area: 1 / 7 / 5 / 8; }
+  .c4 { grid-area: 1 / 8 / 5 / 9; } .s5 { grid-area: 1 / 9 / 5 / 10; }
+  .s3, .s4, .s5 { align-self: center; }
+
+  .simpul { padding: 14px 16px 12px; display: flex; flex-direction: column; gap: 6px; min-width: 0; transition: border-color var(--dur-3), background var(--dur-3); }
+  .simpul h3 { font: 400 19.5px/1.15 var(--font-serif); }
+  .simpul p { font-size: 14px; color: var(--text-2); line-height: 1.45; }
+  .simpul .fakta { margin-top: auto; padding-top: 8px; border-top: 1px solid var(--line); font: 500 14px/1.4 var(--font-sans); color: var(--text); font-variant-numeric: tabular-nums; }
+  .simpul .fakta:empty { display: none; }
+  .simpul.inti { background: var(--surface-2); border-color: var(--line-2); }
+  .simpul.kerja { border-color: var(--line-hover); }
+
+  /* Sambungan cecek: titik-titik yang mengalir hanya saat ada yang diproses */
+  .sambung { position: relative; align-self: center; height: 22px; color: var(--text-3); }
+  .sambung::before { content: ''; position: absolute; left: 4px; right: 11px; top: 14px; height: 4px; background: radial-gradient(circle, currentColor 1.15px, transparent 1.6px) 0 0 / 8px 4px repeat-x; }
+  .sambung::after { content: ''; position: absolute; right: 3px; top: 12px; border-left: 7px solid currentColor; border-top: 4px solid transparent; border-bottom: 4px solid transparent; }
+  .sambung span { position: absolute; left: 0; right: 0; top: -4px; text-align: center; font-size: 12px; line-height: 1; color: var(--text-3); white-space: nowrap; }
+  .sambung.jalan { color: var(--text-2); }
+  .sambung.jalan::before { animation: alir 1.1s linear infinite; }
+  @keyframes alir { to { background-position-x: 8px; } }
+  html.diam .sambung.jalan::before { animation: none; }
+
+  /* Tabel pencairan + kotak operator */
+  .bawah { margin-top: 34px; display: grid; grid-template-columns: minmax(0, 1fr) 372px; gap: 24px; align-items: start; }
+  .tabel-wrap { padding: 20px 20px 16px; min-width: 0; }
+  .tabel-kepala { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; }
+  .tabel-kepala h2, .operator h2 { font: 400 23px/1.2 var(--font-serif); }
+  .tabel-gulir { margin-top: 12px; overflow-x: auto; }
+  table.tabel { width: 100%; border-collapse: collapse; font-size: 14.5px; }
+  .tabel th { text-align: left; font: 500 12.5px/1.3 var(--font-sans); color: var(--text-3); padding: 0 12px 9px; border-bottom: 1px solid var(--line-2); white-space: nowrap; }
+  .tabel td { padding: 9px 12px; border-bottom: 1px solid var(--line); vertical-align: middle; white-space: nowrap; }
+  .tabel tr:last-child td { border-bottom: 0; }
+  .tabel th:first-child, .tabel td:first-child { padding-left: 0; }
+  .tabel .r { text-align: right; }
+  .tabel .no { color: var(--text-3); width: 44px; }
+  .tabel td b { font-weight: 500; }
+  .tabel td .siapa { color: var(--text-3); font-size: 13px; margin-left: 8px; }
+  .tabel .ref { font-size: 13.5px; letter-spacing: .01em; color: var(--text-2); }
+  .tahap { display: inline-flex; align-items: center; gap: 9px; color: var(--text-2); }
+  .tahap i { width: 9px; height: 9px; border-radius: 50%; flex: none; border: 1.5px dashed var(--text-3); }
+  .tahap[data-t="proses"] i { animation: pelan 7s linear infinite; }
+  .tahap[data-t="selesai"] { color: var(--text); }
+  .tahap[data-t="selesai"] i { border: 0; background: var(--soga-400); box-shadow: 0 0 0 3px var(--wash); }
+  .tahap[data-t="kembali"] { color: var(--danger); }
+  .tahap[data-t="kembali"] i { border: 1.5px solid var(--danger); }
+  @keyframes pelan { to { transform: rotate(1turn); } }
+  html.diam .tahap i { animation: none; }
+  .kosong { padding: 26px 0 10px; color: var(--text-3); font-size: 15px; max-width: 38em; }
+  .tabel-kaki { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line); font-size: 13px; color: var(--text-3); line-height: 1.5; }
+
+  .operator { padding: 20px 20px 18px; }
+  .operator .status { margin-top: 10px; white-space: normal; align-items: flex-start; line-height: 1.45; }
+  .operator .status i { margin-top: 5px; }
+  .operator .isi-op { margin-top: 10px; font-size: 14.5px; color: var(--text-2); line-height: 1.55; }
+  .log { list-style: none; padding: 0; margin: 14px 0 0; border-top: 1px solid var(--line); }
+  .log li { display: grid; grid-template-columns: 74px 1fr; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--line); font-size: 14px; color: var(--text-2); line-height: 1.45; }
+  .log time { color: var(--text-3); font-variant-numeric: tabular-nums; }
+  .log a { color: var(--text-3); text-underline-offset: 4px; text-decoration-color: var(--line-2); white-space: nowrap; }
+  .log .kosong-log { display: block; color: var(--text-3); padding: 12px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
+  .operator .btn { margin-top: 16px; }
+  .operator .peringatan { margin-top: 14px; }
+
+  /* Catatan: apa yang tercatat, dan apa yang nyata */
+  .catatan { margin-top: 44px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+  .catatan > div { padding-top: 20px; border-top: 1px solid var(--line); }
+  .catatan h2 { font: 400 23px/1.2 var(--font-serif); }
+  .catatan p { margin-top: 8px; color: var(--text-2); font-size: 15.5px; line-height: 1.6; max-width: 38em; }
+  .catatan p b { font-weight: 500; color: var(--text); }
+
+  @media (max-width: 1180px) {
+    .kepala { grid-template-columns: 1fr; }
+    .bawah { grid-template-columns: 1fr; }
+    .alur { display: flex; flex-direction: column; align-items: stretch; gap: 0; }
+    .alur .jalur-label { padding: 18px 0 8px; align-self: stretch; }
+    .alur .jl1 { padding-top: 0; }
+    .alur .c2, .alur .cb { display: none; }
+    .alur .sambung { height: 40px; }
+    .alur .sambung::before { left: 50%; right: auto; top: 6px; bottom: 12px; width: 4px; height: auto; margin-left: -2px; background: radial-gradient(circle, currentColor 1.15px, transparent 1.6px) 0 0 / 4px 8px repeat-y; }
+    .alur .sambung::after { left: 50%; right: auto; top: auto; bottom: 3px; margin-left: -4px; border-left: 4px solid transparent; border-right: 4px solid transparent; border-top: 7px solid currentColor; border-bottom: 0; }
+    .alur .sambung span { left: calc(50% + 12px); right: auto; top: 14px; text-align: left; }
+    @keyframes alir { to { background-position-y: 8px; } }
+    .alur .c3 { margin-top: 12px; }
+  }
+  @media (max-width: 760px) {
+    .catatan { grid-template-columns: 1fr; }
+    .deret { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .atas .jaringan, .atas .konteks .garis-v, .atas .konteks span { display: none; }
+  }
+</style>
+</head>
+<body>
+<header class="atas">
+  <div class="konteks"><a class="merek" href="index.html" aria-label="Pusaka, beranda"><span id="logo"></span><b>Pusaka</b></a><i class="garis-v"></i><span>Mitra pencairan</span></div>
+  <div class="kanan" id="kanan"><span class="jaringan" id="jaringan"><i></i><span>Monad testnet</span><span>blok <b>0</b></span></span></div>
+</header>
+
+<main>
+  <section class="kepala">
+    <div>
+      <span class="status" id="chip" data-s="belum"><i></i><span id="chipT">Membaca mitra</span></span>
+      <h1 id="judul">Mitra pencairan (simulasi)</h1>
+      <p class="t-lead" id="lead">Di sinilah tIDR menjadi rupiah di rekening. Mitra pencairan berizin menyapu tIDR dari rekening virtual ahli waris, menukarnya dengan rupiah, lalu mentransfernya lewat BI-FAST. Ahli waris tidak melakukan apa pun.</p>
+      <p class="peringatan">Simulasi: transfer bank tidak sungguhan di testnet.</p>
+    </div>
+    <dl class="deret" aria-live="off">
+      <div class="stat"><dt>Rekening virtual</dt><dd class="n angka" id="nRek">—</dd><dd class="sebab">Satu per ahli waris yang menerima lewat bank atau e-wallet.</dd></div>
+      <div class="stat"><dt>Pencairan</dt><dd class="n angka" id="nCair">—</dd><dd class="sebab">Tiap kali tIDR masuk ke mitra untuk ditukar rupiah.</dd></div>
+      <div class="stat"><dt>Menunggu</dt><dd class="n angka" id="nAntre">—</dd><dd class="sebab">Sedang diproses mitra, biasanya hanya beberapa detik.</dd></div>
+      <div class="stat"><dt>Selesai</dt><dd class="n angka" id="nSelesai">—</dd><dd class="sebab">Sudah ditransfer dan nomor referensinya tercatat.</dd></div>
+      <div class="stat"><dt>Rupiah ditransfer</dt><dd class="n angka" id="nRupiah">—</dd><dd class="sebab">Jumlah semua pencairan yang selesai (simulasi).</dd></div>
+      <div class="stat"><dt>tIDR beredar</dt><dd class="n angka" id="nSuplai">—</dd><dd class="sebab">Berkurang tiap transfer selesai: tIDR dibakar sebagai tanda penukaran.</dd></div>
+    </dl>
+  </section>
+
+  <section class="alur-wrap" aria-labelledby="alurJ">
+    <h2 id="alurJ">Dari dompet pewaris ke rekening ahli waris</h2>
+    <p>Dua jalur masuk ke mitra yang sama. Titik-titik mengalir saat ada yang sedang diproses.</p>
+    <div class="alur" role="list">
+      <p class="jalur-label jl1"><b>Jalur 1.</b> Rekening bank atau e-wallet: ahli waris tidak melakukan apa pun</p>
+      <div class="simpul lembar s1" role="listitem"><h3>Dompet Budi Santoso</h3><p>Aturan warisan ada di dompetnya. Saat dibagikan, tIDR dikirim ke tiap ahli waris.</p><b class="fakta" id="f1"></b></div>
+      <div class="sambung c1" aria-hidden="true"><span>tIDR</span></div>
+      <div class="simpul lembar s2" role="listitem"><h3>Rekening virtual</h3><p>Satu per ahli waris, didaftarkan di mitra saat aturan dipasang.</p><b class="fakta" id="f2"></b></div>
+      <div class="sambung c2" id="c2" aria-hidden="true"><span>disapu</span></div>
+
+      <p class="jalur-label jl2"><b>Jalur 2.</b> Amplop digital: ahli waris memilih tujuannya sendiri</p>
+      <div class="simpul lembar a1" role="listitem"><h3>Amplop digital</h3><p>Tautan WhatsApp. Baru berguna setelah warisan dibagikan.</p><b class="fakta">Tanpa aplikasi, tanpa dompet</b></div>
+      <div class="sambung ca" aria-hidden="true"><span>buka</span></div>
+      <div class="simpul lembar a2" role="listitem"><h3>Memilih bank atau e-wallet</h3><p>Ahli waris mengetik nomor tujuan lalu menandatangani. Pusaka menanggung biaya jaringan.</p><b class="fakta">Satu tanda tangan di HP-nya</b></div>
+      <div class="sambung cb" id="cb" aria-hidden="true"><span>cairkan</span></div>
+
+      <div class="simpul lembar inti s3" id="s3" role="listitem"><h3>Mitra pencairan</h3><p>Menyapu tIDR dari rekening virtual dan amplop, lalu menukarnya dengan rupiah. Di testnet tIDR dibakar sebagai tanda penukaran.</p><b class="fakta" id="f3"></b></div>
+      <div class="sambung c3" id="c3" aria-hidden="true"><span>tukar</span></div>
+      <div class="simpul lembar s4" role="listitem"><h3>Transfer BI-FAST</h3><p>Rupiah dikirim ke rekening tujuan dengan nomor referensi (buatan di testnet).</p><b class="fakta" id="f4"></b></div>
+      <div class="sambung c4" id="c4" aria-hidden="true"><span>rupiah</span></div>
+      <div class="simpul lembar s5" role="listitem"><h3>Rekening ahli waris</h3><p>Bank atau e-wallet. Di blockchain hanya tercatat nama bank dan empat digit terakhir.</p><b class="fakta">Tanpa dompet kripto</b></div>
+    </div>
+  </section>
+
+  <section class="bawah">
+    <div class="tabel-wrap lembar">
+      <div class="tabel-kepala"><h2>Pencairan terbaru</h2><span class="t-micro angka" id="info">—</span></div>
+      <div class="tabel-gulir">
+        <table class="tabel" id="tabel" hidden>
+          <thead><tr><th>No</th><th>Diminta</th><th>Tujuan</th><th class="r">Jumlah</th><th>Tahap</th><th>Referensi BI-FAST</th><th>Selesai</th></tr></thead>
+          <tbody id="baris"></tbody>
+        </table>
+      </div>
+      <p class="kosong" id="kosong">Belum ada pencairan. Setelah warisan dibagikan, rekening virtual disapu dan baris pertama muncul di sini.</p>
+      <p class="tabel-kaki">Satu baris adalah seluruh tIDR dari satu rekening virtual atau amplop. Setelah transfer selesai, tIDR itu dibakar dan nomor referensinya tercatat di blockchain.</p>
+    </div>
+
+    <aside class="operator lembar" aria-labelledby="opJ">
+      <h2 id="opJ">Operator mitra</h2>
+      <span class="status" id="opStatus" data-s="belum"><i></i><span id="opT"></span></span>
+      <p class="isi-op" id="opIsi"></p>
+      <ul class="log" id="log" aria-label="Catatan operator"></ul>
+      <button class="btn btn--garis btn--penuh" id="proses" type="button">Proses sekarang</button>
+      <p class="peringatan">Operator berjalan di laptop presenter. Catatan di atas hanya berisi yang diproses dari tab ini.</p>
+    </aside>
+  </section>
+
+  <section class="catatan">
+    <div>
+      <h2>Yang tercatat di blockchain</h2>
+      <p>Hanya <b>nama bank</b>, <b>empat digit terakhir</b>, dan <b>sidik bergaram</b> dari rincian rekening. Nomor lengkap dan nama pemilik rekening tidak ditulis di blockchain. Pencocokan rincian lengkap terjadi di luar blockchain; di testnet tidak ada, karena transfernya disimulasikan.</p>
+    </div>
+    <div>
+      <h2>Produk nyata dan testnet</h2>
+      <p>Di produk nyata, <b>mitra pencairan berizin</b> menukar stablecoin rupiah dengan rupiah sungguhan, lalu mentransfernya lewat BI-FAST. Di testnet semuanya simulasi: operator di laptop presenter yang “mentransfer”, tIDR dibakar sebagai tanda penukaran, dan nomor referensi dibuat dari bukti yang dicatat di kontrak.</p>
+    </div>
+  </section>
+</main>
+
+<script type="module">
+import '/src/boot.js';
+const S = Demo, D = Pusaka;
+Latar.pasang();
+Demo.panel({ judul: 'Panel demo' });
+document.getElementById('logo').outerHTML = UI.MEREK;
+UI.blok(document.getElementById('jaringan'));
+UI.dompetDemo(document.getElementById('kanan'));
+
+const $ = (id) => document.getElementById(id);
+const NF = (n) => Number(n).toLocaleString('id-ID');
+const esc = (t) => String(t).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const tidur = (ms) => new Promise((r) => setTimeout(r, ms));
+/* Rupiah penuh; di atas Rp1 miliar diringkas supaya muat di kotak angka. */
+const ringkas = (juta) => (juta >= 1000 ? `Rp${(juta / 1000).toLocaleString('id-ID', { maximumFractionDigits: 2 })} miliar` : D.rp(juta));
+/* Detik kontrak → jam perangkat (ms). keJamPerangkat milik inti tidak diekspor, jadi dihitung dari jam kontrak. */
+const keJam = (ts) => Number(ts) * 1000 - ((S.sekarangKontrak() + .5) * 1000 - Date.now());
+const TAHAP_UI = { 1: ['proses', 'Diproses'], 2: ['selesai', 'Selesai'], 3: ['kembali', 'Dikembalikan'] };
+const STATUS_TEKS = { 0: 'Aturan belum dipasang', 1: 'Aturan aktif', 2: 'Masa sanggah berjalan', 3: 'Warisan sudah dibagikan' };
+const BARIS = 15;
+
+/* ---------- membaca mitra ---------- */
+const cair = new Map(); // no → pencairan (final tidak dibaca ulang)
+const rek = new Map();  // id rekening → { bank, akhiran }
+let akhir = null, sibuk = false, sigTabel = '', sigLog = '', mengerjakan = false;
+const pernah = new Set(); // nomor baris yang sudah pernah tampil, untuk animasi masuk
+const tahapLama = new Map();
+
+async function ambilCair(nos) {
+  for (let i = 0; i < nos.length; i += 25) {
+    const bagian = nos.slice(i, i + 25);
+    const hasil = await Promise.all(bagian.map((no) => S.bacaMitra('getPencairan', [BigInt(no)])));
+    const idBaru = new Set();
+    hasil.forEach((p, k) => {
+      cair.set(bagian[k], {
+        no: bagian[k], rekening: p.rekening, dari: p.dari, diminta: Number(p.diminta), jumlah: S.juta(p.jumlah),
+        selesai: Number(p.selesai), tahap: Number(p.tahap), bukti: p.bukti,
+      });
+      if (!rek.has(p.rekening)) idBaru.add(p.rekening);
+    });
+    const ids = [...idBaru];
+    const rs = await Promise.all(ids.map((id) => S.bacaMitra('getRekening', [id])));
+    rs.forEach((r, k) => rek.set(ids[k], { bank: r.bank, akhiran: r.akhiran }));
+  }
+}
+
+async function tarik() {
+  if (sibuk) return;
+  sibuk = true;
+  try {
+    const [nRek, nCair, antre, suplai, berisi] = await Promise.all([
+      S.bacaMitra('jumlahRekening'), S.bacaMitra('jumlahPencairan'), S.bacaMitra('antrean'),
+      S.bacaToken('totalSupply'), S.bacaMitra('vaBerisi', [0n, 500n]), // kontrak memangkas batas atas ke jumlah rekening
+    ]);
+    const N = Number(nCair);
+    if ([...cair.keys()].some((k) => k >= N)) { cair.clear(); rek.clear(); pernah.clear(); tahapLama.clear(); sigTabel = ''; } // rantai diulang
+    const dalamAntre = new Set(antre.map(Number));
+    const perlu = [];
+    for (let no = N - 1; no >= Math.max(0, N - 300); no--) {
+      const c = cair.get(no);
+      if (!c || (c.tahap === 1 && !dalamAntre.has(no))) perlu.push(no);
+    }
+    if (perlu.length) await ambilCair(perlu);
+    akhir = { nRek: Number(nRek), N, antre: antre.length, berisi: berisi.length, suplai: S.juta(suplai) };
+    gambar();
+  } catch (e) {
+    console.warn('Mitra: gagal membaca kontrak', e);
+  } finally {
+    sibuk = false;
+  }
+}
+
+/* ---------- menggambar ---------- */
+function setAngka(el, nilai, fmt) {
+  const lama = el._v;
+  el._v = nilai;
+  if (lama === undefined || lama === nilai || Demo.diam) { el.textContent = fmt(nilai); return; }
+  if (el._tw) el._tw.kill();
+  el._tw = UI.hitungNaik(el, nilai, { dari: lama, dur: .9, fmt });
+}
+const bulat = (v) => NF(Math.round(v));
+
+/* Nama peran bila pencairan berasal dari alamat penerima pewaris yang sedang dipantau */
+function peranDari(alamat) {
+  const a = String(alamat).toLowerCase();
+  for (const id of S.ID_PENERIMA) {
+    const x = S.s.penerima[id];
+    if (x && x.alamat && x.alamat.toLowerCase() === a) return D.PERAN_PANJANG[id];
+  }
+  return '';
+}
+
+function barisHTML(c) {
+  const r = rek.get(c.rekening) || { bank: '—', akhiran: '' };
+  const t = TAHAP_UI[c.tahap] || TAHAP_UI[1];
+  const selesaiMs = c.selesai ? keJam(c.selesai) : null;
+  const siapa = peranDari(c.dari);
+  return `<tr data-no="${c.no}">
+    <td class="no angka">${c.no + 1}</td>
+    <td class="angka">${D.jam(keJam(c.diminta))}</td>
+    <td><b>${esc(r.bank)} ••••${esc(r.akhiran)}</b>${siapa ? `<span class="siapa">${esc(siapa)}</span>` : ''}</td>
+    <td class="r angka">${D.rp(c.jumlah)}</td>
+    <td><span class="tahap" data-t="${t[0]}"><i></i>${t[1]}</span></td>
+    <td class="ref angka">${c.tahap === 2 && selesaiMs ? esc(S.refBank(c.bukti, selesaiMs)) : '<span class="redup">—</span>'}</td>
+    <td class="angka">${selesaiMs ? D.jam(selesaiMs) : '<span class="redup">—</span>'}</td>
+  </tr>`;
+}
+
+function gambar() {
+  if (!akhir) return;
+  const semua = [...cair.values()];
+  const selesai = semua.filter((c) => c.tahap === 2);
+  const jutaSelesai = selesai.reduce((a, c) => a + c.jumlah, 0);
+  const dikembalikan = semua.filter((c) => c.tahap === 3).length;
+
+  setAngka($('nRek'), akhir.nRek, bulat);
+  setAngka($('nCair'), akhir.N, bulat);
+  setAngka($('nAntre'), akhir.antre, bulat);
+  setAngka($('nSelesai'), selesai.length, bulat);
+  setAngka($('nRupiah'), jutaSelesai, ringkas);
+  setAngka($('nSuplai'), akhir.suplai, ringkas);
+
+  // simpul diagram
+  $('f1').textContent = STATUS_TEKS[S.s.status] || '';
+  $('f2').textContent = `${NF(akhir.nRek)} terdaftar · ${NF(akhir.berisi)} berisi tIDR`;
+  $('f3').textContent = `${NF(akhir.antre)} menunggu · ${NF(selesai.length)} selesai`;
+  $('f4').textContent = `${ringkas(jutaSelesai)} sudah ditransfer`;
+  const kerja = akhir.antre > 0 || akhir.berisi > 0;
+  $('s3').classList.toggle('kerja', kerja);
+  $('c2').classList.toggle('jalan', akhir.berisi > 0);
+  $('c3').classList.toggle('jalan', akhir.antre > 0);
+  $('c4').classList.toggle('jalan', akhir.antre > 0);
+  $('cb').classList.toggle('jalan', akhir.antre > 0);
+
+  // tabel: terbaru di atas
+  const tampil = semua.sort((a, b) => b.no - a.no).slice(0, BARIS);
+  $('info').textContent = akhir.N ? `${tampil.length} dari ${NF(akhir.N)}${dikembalikan ? ` · ${dikembalikan} dikembalikan` : ''}` : 'belum ada';
+  $('tabel').hidden = !tampil.length;
+  $('kosong').hidden = !!tampil.length;
+  const sig = tampil.map((c) => `${c.no}:${c.tahap}:${(rek.get(c.rekening) || {}).akhiran}:${peranDari(c.dari)}`).join('|');
+  if (sig !== sigTabel) {
+    sigTabel = sig;
+    $('baris').innerHTML = tampil.map(barisHTML).join('');
+    $('baris').querySelectorAll('tr').forEach((tr) => {
+      const no = Number(tr.dataset.no), c = cair.get(no);
+      const baru = !pernah.has(no), berubah = tahapLama.has(no) && tahapLama.get(no) !== c.tahap;
+      if (baru && pernah.size) UI.masuk(tr.querySelectorAll('td'));
+      else if (berubah) UI.masuk(tr.querySelectorAll('td:nth-child(n+5)'));
+      pernah.add(no); tahapLama.set(no, c.tahap);
+    });
+  }
+  gambarOperator();
+}
+
+function gambarOperator() {
+  const aktif = S.operatorAktif, ada = !!S.operator;
+  const antre = akhir ? akhir.antre : 0;
+  const chip = $('chip'), op = $('opStatus');
+  chip.dataset.s = aktif ? 'aktif' : 'belum';
+  $('chipT').textContent = !ada ? 'Operator tidak ada di perangkat ini' : !aktif ? 'Operator tidak berjalan di tab ini' : antre ? `Memproses ${antre} pencairan` : 'Operator berjalan di tab ini';
+  op.dataset.s = aktif ? 'aktif' : 'belum';
+  $('opT').textContent = aktif ? `Berjalan di tab ini · ${S.pendek(S.operator.address)}` : 'Tidak berjalan di tab ini';
+  $('opIsi').textContent = !ada
+    ? 'Perangkat ini tidak memegang kunci operator. Di testnet, operator dijalankan dari laptop presenter.'
+    : aktif
+      ? 'Rekening virtual yang berisi disapu otomatis. Sekitar satu sampai dua detik kemudian, transfer bank dicatat selesai dengan nomor referensi.'
+      : 'Operator hanya berjalan di layar presenter yang terbuka sebagai jendela utama.';
+  $('proses').disabled = !aktif || mengerjakan;
+  $('proses').textContent = mengerjakan ? 'Memproses…' : 'Proses sekarang';
+
+  const l = S.mitraLog.slice(-6).reverse();
+  const sig = l.map((x) => x.t + x.teks).join('|');
+  if (sig !== sigLog) {
+    sigLog = sig;
+    $('log').innerHTML = l.length
+      ? l.map((x) => `<li><time>${D.jam(x.t)}</time><span>${esc(x.teks)}${x.tx && S.EXPLORER ? ` <a href="${S.EXPLORER}/tx/${esc(x.tx)}" target="_blank" rel="noopener">lihat</a>` : ''}</span></li>`).join('')
+      : '<li class="kosong-log">Belum ada yang diproses.</li>';
+  }
+}
+
+/* "Proses sekarang": operator butuh beberapa putaran (sapu, lalu tunggu ±1,4 detik, lalu selesaikan). */
+$('proses').addEventListener('click', async () => {
+  if (mengerjakan) return;
+  mengerjakan = true; gambarOperator();
+  try {
+    for (let i = 0; i < 4; i++) {
+      await S.prosesMitra();
+      await tidur(1650);
+      const [antre, berisi] = await Promise.all([S.bacaMitra('antrean'), S.bacaMitra('vaBerisi', [0n, 500n])]);
+      if (!antre.length && !berisi.length) break;
+    }
+  } finally {
+    mengerjakan = false;
+    await tarik();
+    gambarOperator();
+  }
+});
+
+S.on((s, prev, sebab) => {
+  if (sebab === 'pencairan' || sebab === 'dibagikan' || sebab === 'ulang' || sebab === 'pasang') tarik();
+  if (akhir) { $('f1').textContent = STATUS_TEKS[s.status] || ''; if (sebab === 'ulang') { sigTabel = ''; gambar(); } }
+});
+
+setInterval(tarik, 1500);
+setInterval(gambarOperator, 1000);
+tarik();
+
+document.fonts.ready.then(() => {
+  if (Demo.diam) return;
+  UI.masuk([$('chip'), $('judul'), $('lead')]);
+  gsap.from('.simpul', { opacity: 0, y: -8, duration: .7, stagger: .05, ease: 'power3.out', delay: .25 });
+  gsap.from('.stat', { opacity: 0, y: -6, duration: .6, stagger: .05, ease: 'power3.out', delay: .2 });
+});
+</script>
+</body>
+</html>

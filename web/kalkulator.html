@@ -1,0 +1,408 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='4' fill='%23131b33'/%3E%3Crect x='4.5' y='4.5' width='15' height='15' fill='none' stroke='%23f5efe3' stroke-width='1.4'/%3E%3Cpath d='M8 19.5 12.4 4.5M12 19.5 16.3 4.5' stroke='%23f5efe3' stroke-width='1.4'/%3E%3C/svg%3E">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#131b33" id="warnaTema">
+<title>Kalkulator faraid — Pusaka</title>
+<script>
+  /* tema dipilih sebelum gambar pertama agar tidak berkedip */
+  (() => {
+    let t = null;
+    try { t = localStorage.getItem('pusaka-tema'); } catch {}
+    if (!t) t = matchMedia('(prefers-color-scheme: light)').matches ? 'terang' : 'gelap';
+    if (t === 'terang') document.documentElement.dataset.tema = 'terang';
+  })();
+</script>
+<link rel="stylesheet" href="assets/fonts.css">
+<link rel="stylesheet" href="assets/tokens.css">
+<link rel="stylesheet" href="assets/base.css">
+<style>
+  main { max-width: 1360px; margin: 0 auto; padding: 0 var(--gutter) 96px; }
+  .atas { max-width: 1360px; margin: 0 auto; }
+  .judul-halaman { padding-top: 20px; max-width: 46em; }
+  .judul-halaman h1 { font: 400 clamp(36px, 4vw, 56px)/1.02 var(--font-serif); letter-spacing: -.015em; }
+  .judul-halaman .t-lead { margin-top: 12px; font-size: 18px; }
+
+  .contoh { display: flex; gap: 8px; margin-top: 24px; overflow-x: auto; padding-bottom: 6px; scrollbar-width: none; }
+  .contoh::-webkit-scrollbar { display: none; }
+  .contoh button { flex: none; background: none; border: 1px solid var(--line-2); color: var(--text-2); padding: 8px 14px; border-radius: var(--r-pill); cursor: pointer; font-size: 14.5px; transition: border-color var(--dur-1), color var(--dur-1), background var(--dur-1); }
+  .contoh button:hover { border-color: var(--line-hover); color: var(--text); }
+  .contoh button[aria-pressed="true"] { background: var(--btn-bg); color: var(--btn-fg); border-color: transparent; }
+
+  /* Baris kedua 1fr: kalau kolom isian lebih panjang, sisa tinggi jatuh ke hasil, bukan jadi celah di bawah kain */
+  .kerja { display: grid; grid-template-columns: minmax(300px, 380px) minmax(0, 1fr); grid-template-rows: auto 1fr; grid-template-areas: "isi kain" "isi hasil"; gap: 0 56px; margin-top: 28px; align-items: start; }
+  .kain-blok { grid-area: kain; position: sticky; top: 16px; z-index: 4; }
+  .isian-blok { grid-area: isi; }
+  .hasil-blok { grid-area: hasil; }
+
+  /* Kain menempel saat digulir. Alasnya gambar latar yang sama (fixed), jadi baris yang lewat di bawahnya tertutup tanpa kotak terlihat */
+  .kain-blok::before {
+    content: ''; position: absolute; z-index: -1; inset: -16px -28px -64px; pointer-events: none;
+    background: var(--latar-gambar, none) 0 0 / 100vw 100vh no-repeat fixed, var(--bg);
+    -webkit-mask-image: linear-gradient(#000 calc(100% - 44px), transparent); mask-image: linear-gradient(#000 calc(100% - 44px), transparent);
+    opacity: 0; transition: opacity var(--dur-2);
+  }
+  .kain-blok.lekat::before { opacity: 1; }
+  .kain-bingkai { position: relative; }
+  .kain-pesan { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; padding: 0 12%; pointer-events: none; font: italic 400 clamp(19px, 2vw, 26px)/1.25 var(--font-serif); color: #6f675a; opacity: 0; }
+
+  /* Isian */
+  .harta { padding-bottom: 18px; border-bottom: 1px solid var(--line); }
+  .harta label { font-size: 14.5px; color: var(--text-3); }
+  .harta .rp { display: flex; align-items: baseline; gap: 6px; border-bottom: 1px solid var(--line-2); margin-top: 4px; transition: border-color var(--dur-1); }
+  .harta .rp:focus-within { border-bottom-color: var(--focus); }
+  .harta .rp span { font: 400 30px/1 var(--font-serif); color: var(--text-3); }
+  .harta input { flex: 1 1 auto; width: 0; min-width: 0; background: none; border: 0; outline: none; font: 400 40px/1.25 var(--font-serif); color: var(--text); padding: 4px 0; font-variant-numeric: lining-nums tabular-nums; }
+  .grup-isi { padding: 6px 0; border-bottom: 1px solid var(--line); }
+  .baris { display: flex; justify-content: space-between; align-items: center; gap: 16px; min-height: 54px; padding: 6px 0; }
+  .baris + .baris { border-top: 1px solid var(--line); }
+  .baris > span { font-size: 16px; min-width: 0; }
+  .baris > span small { display: block; color: var(--text-3); font-size: 13px; margin-top: 2px; line-height: 1.4; }
+  .baris.tumpuk { flex-wrap: wrap; padding: 12px 0; gap: 10px; }
+  .baris.tumpuk > span { flex: 1 1 100%; }
+  .baris.tumpuk .segmen { display: flex; width: 100%; }
+  .baris.tumpuk .segmen label { flex: 1 1 0; }
+  .baris.tumpuk .segmen span { text-align: center; }
+  details.lanjutan { border-bottom: 1px solid var(--line); }
+  details.lanjutan summary { cursor: pointer; padding: 16px 0; color: var(--text-2); list-style: none; display: flex; align-items: center; gap: 10px; font-size: 15.5px; }
+  details.lanjutan summary::-webkit-details-marker { display: none; }
+  details.lanjutan summary::before { content: ''; width: 7px; height: 7px; border-right: 1.4px solid currentColor; border-bottom: 1.4px solid currentColor; transform: rotate(-45deg); transition: transform var(--dur-2); margin: 0 4px 0 2px; }
+  details.lanjutan[open] summary::before { transform: rotate(45deg); }
+  details.lanjutan .isi-l { padding-bottom: 8px; }
+  .pilih { appearance: none; -webkit-appearance: none; background: transparent url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%2397a4c3' stroke-width='1.4'/%3E%3C/svg%3E") no-repeat right 4px center; border: 0; border-bottom: 1px solid var(--line-2); height: 40px; padding: 0 26px 0 2px; color: var(--text); font-size: 15.5px; cursor: pointer; border-radius: 0; }
+  .pilih option { background: var(--surface); color: var(--text); }
+
+  /* Kain + hasil */
+  .kain-blok .kain-host { width: 100%; }
+  .alur { display: flex; flex-wrap: wrap; gap: 0; margin-top: 18px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  .alur[hidden] { display: none; }
+  .alur div { flex: 1 1 0; min-width: 120px; padding: 12px 16px 12px 0; display: flex; flex-direction: column; }
+  .alur div + div { padding-left: 16px; border-left: 1px solid var(--line); }
+  .alur small { display: block; font-size: 13px; color: var(--text-3); }
+  /* angka selalu sejajar di dasar sel walau labelnya terlipat dua baris */
+  .alur b { display: block; margin-top: auto; padding-top: 2px; font: 400 22px/1.2 var(--font-serif); font-variant-numeric: lining-nums; }
+  .rincian { margin-top: 8px; }
+  .rincian .r { display: grid; grid-template-columns: 14px minmax(0, 1fr) auto; gap: 4px 14px; padding: 14px 6px 14px 4px; border-bottom: 1px solid var(--line); transition: background var(--dur-1); }
+  .rincian .r.sorot { background: var(--wash); }
+  .rincian .r i { width: 14px; height: 14px; margin-top: 4px; box-shadow: inset 0 0 0 1px rgb(255 255 255 / .12); }
+  .rincian .r .nama b { font-weight: 500; font-size: 17px; }
+  .rincian .r .nama .frac { margin-left: 10px; color: var(--text-2); font-size: 17px; }
+  .rincian .r .rp { font-weight: 500; font-size: 17px; font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
+  .rincian .r p { grid-column: 2 / -1; color: var(--text-3); font-size: 14.5px; line-height: 1.5; max-width: 52em; }
+  .catatan { margin-top: 18px; display: grid; gap: 8px; }
+  .catatan p { font-size: 14.5px; color: var(--text-2); border-left: 2px solid var(--prada-500); padding: 2px 0 2px 12px; line-height: 1.5; }
+  .tolak-blok { margin-top: 18px; }
+  .tolak-blok h2 { font: 400 26px/1.2 var(--font-serif); }
+  .tolak-blok .tolak { margin-top: 12px; font-size: 16px; line-height: 1.55; }
+  .tolak-blok p.redup { margin-top: 12px; font-size: 15px; line-height: 1.55; max-width: 40em; }
+  .kaki { margin-top: 36px; display: grid; gap: 10px; }
+
+  .tema-tombol .segmen span { padding: 5px 12px; font-size: 13.5px; }
+
+  @media (max-width: 860px) {
+    .kerja { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto; grid-template-areas: "kain" "isi" "hasil"; gap: 0; }
+    .isian-blok .baris, .isian-blok summary, .harta { scroll-margin-top: calc(var(--tinggi-kain, 160px) + 24px); }
+    .kain-blok { top: 0; z-index: 5; padding: 10px var(--gutter) 14px; margin: 0 calc(var(--gutter) * -1); }
+    .kain-blok::before { inset: 0 0 -40px; -webkit-mask-image: linear-gradient(#000 calc(100% - 28px), transparent); mask-image: linear-gradient(#000 calc(100% - 28px), transparent); }
+    .isian-blok { margin-top: 8px; }
+    .hasil-blok { margin-top: 28px; }
+    .contoh { margin-left: calc(var(--gutter) * -1); margin-right: calc(var(--gutter) * -1); padding-left: var(--gutter); padding-right: var(--gutter); scroll-padding-inline: var(--gutter); }
+  }
+  @media (max-width: 520px) {
+    .atas .konteks .garis-v, .atas .konteks > span { display: none; }
+    .harta input { font-size: 34px; }
+    .alur { display: grid; grid-template-columns: 1fr 1fr; }
+    .alur div:nth-child(odd) { padding-left: 0; border-left: 0; }
+    .alur div:nth-child(n+3) { border-top: 1px solid var(--line); }
+    .alur div:last-child:nth-child(odd) { grid-column: 1 / -1; }
+    .rincian .r .nama .frac { display: block; margin-left: 0; margin-top: 2px; font-size: 16px; }
+  }
+</style>
+</head>
+<body>
+<header class="atas">
+  <div class="konteks"><a class="merek" href="index.html" aria-label="Pusaka, beranda"><span id="logo"></span><b>Pusaka</b></a><i class="garis-v"></i><span>Kalkulator faraid</span></div>
+  <div class="kanan tema-tombol">
+    <div class="segmen" role="radiogroup" aria-label="Tema">
+      <label><input type="radio" name="tema" value="gelap"><span>Gelap</span></label>
+      <label><input type="radio" name="tema" value="terang"><span>Terang</span></label>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="judul-halaman">
+    <h1 class="resap">Kalkulator faraid</h1>
+    <p class="t-lead resap" style="--i:1">Isi susunan keluarga, lalu lihat bagian masing-masing menurut Kompilasi Hukum Islam. Hitungannya sama dengan aturan yang dijalankan kontrak Pusaka.</p>
+  </div>
+
+  <div class="contoh" id="contoh" role="group" aria-label="Contoh susunan keluarga"></div>
+
+  <div class="kerja">
+    <div class="kain-blok" id="kainBlok">
+      <div class="kain-bingkai">
+        <div class="kain-host" id="kainHost"></div>
+        <p class="kain-pesan" id="kainPesan" aria-hidden="true"></p>
+      </div>
+    </div>
+
+    <form class="isian-blok" id="form" novalidate onsubmit="return false">
+      <div class="harta">
+        <label for="harta">Harta yang dibagi</label>
+        <div class="rp"><span>Rp</span><input id="harta" inputmode="numeric" autocomplete="off" value="120.000.000"></div>
+      </div>
+      <div class="grup-isi">
+        <div class="baris"><span>Pewaris</span>
+          <div class="segmen" role="radiogroup" aria-label="Jenis kelamin pewaris">
+            <label><input type="radio" name="kelamin" value="laki" checked><span>Laki-laki</span></label>
+            <label><input type="radio" name="kelamin" value="perempuan"><span>Perempuan</span></label>
+          </div>
+        </div>
+      </div>
+      <div class="grup-isi">
+        <div class="baris" id="rIstri"><span>Istri</span><div class="stepper" data-k="istri" data-min="0" data-max="5"></div></div>
+        <div class="baris" id="rSuami" hidden><span>Suami</span><label class="saklar"><input type="checkbox" data-k="suami" aria-label="Suami"></label></div>
+        <div class="baris"><span>Anak laki-laki</span><div class="stepper" data-k="putra" data-min="0" data-max="12"></div></div>
+        <div class="baris"><span>Anak perempuan</span><div class="stepper" data-k="putri" data-min="0" data-max="12"></div></div>
+        <div class="baris"><span>Ayah</span><label class="saklar"><input type="checkbox" data-k="ayah" aria-label="Ayah"></label></div>
+        <div class="baris"><span>Ibu</span><label class="saklar"><input type="checkbox" data-k="ibu" aria-label="Ibu"></label></div>
+        <div class="baris"><span>Saudara kandung<small>Yang masih hidup</small></span><div class="stepper" data-k="saudara" data-min="0" data-max="12"></div></div>
+        <div class="baris"><span>Kerabat lain<small>Cucu, kakek, atau nenek yang mungkin mewarisi</small></span><label class="saklar"><input type="checkbox" data-k="kerabatLain" aria-label="Ada kerabat lain"></label></div>
+      </div>
+      <details class="lanjutan" id="lanjutan">
+        <summary>Harta bersama, wasiat, dan mode radd</summary>
+        <div class="isi-l">
+          <div class="baris tumpuk"><span id="lblBersama">Harta bersama</span>
+            <div class="segmen" role="radiogroup" aria-label="Porsi harta bersama">
+              <label><input type="radio" name="bersama" value="tidak" checked><span>Tidak</span></label>
+              <label><input type="radio" name="bersama" value="separuh"><span>Separuh</span></label>
+              <label><input type="radio" name="bersama" value="seluruh"><span>Semua</span></label>
+            </div>
+          </div>
+          <div class="baris"><span>Wasiat<small>Untuk yang bukan ahli waris, paling banyak sepertiga</small></span>
+            <select class="pilih" id="selWasiat" aria-label="Bagian wasiat">
+              <option value="">Tidak ada</option><option>1/10</option><option>1/8</option><option>1/6</option><option>1/5</option><option>1/4</option><option>1/3</option>
+            </select>
+          </div>
+          <div class="baris"><span>Sisa juga untuk pasangan<small>Mode KHI harfiah. Bawaan Pusaka mengikuti jumhur: sisa tidak dikembalikan kepada suami atau istri.</small></span><label class="saklar"><input type="checkbox" data-k="raddPasangan" aria-label="Radd ke pasangan"></label></div>
+        </div>
+      </details>
+    </form>
+
+    <section class="hasil-blok" id="hasil" aria-live="polite">
+      <div class="alur" id="alur" hidden></div>
+      <div id="isiHasil"></div>
+      <div class="kaki">
+        <p class="peringatan">Hanya untuk ahli waris inti: pasangan, anak, ayah, dan ibu. Bukan fatwa. Untuk kepastian hukum, tanyakan kepada ahli faraid atau Pengadilan Agama.</p>
+      </div>
+    </section>
+  </div>
+</main>
+
+<script type="module">
+import '/src/boot.js';
+const D = Pusaka;
+Latar.pasang();
+Demo.panel({ judul: 'Panel demo', aksiStatus: false });
+document.getElementById('logo').outerHTML = UI.MEREK;
+const $ = (id) => document.getElementById(id);
+
+/* ---------- tema ---------- */
+document.querySelectorAll('input[name="tema"]').forEach((r) => {
+  r.checked = (r.value === 'terang') === (document.documentElement.dataset.tema === 'terang');
+  r.onchange = () => {
+    const terang = r.value === 'terang';
+    if (terang) document.documentElement.dataset.tema = 'terang'; else delete document.documentElement.dataset.tema;
+    try { localStorage.setItem('pusaka-tema', r.value); } catch {}
+    $('warnaTema').content = terang ? '#e8eaef' : '#131b33';
+    Latar.gambar && Latar.gambar();
+  };
+});
+if (document.documentElement.dataset.tema === 'terang') $('warnaTema').content = '#e8eaef';
+
+/* ---------- contoh susunan dari faraid-spec.md ---------- */
+const DASAR = { harta: 120, laki: true, istri: 0, suami: false, putra: 0, putri: 0, ayah: false, ibu: false, saudara: 0, kerabatLain: false, bersama: 'tidak', wasiat: '', raddPasangan: false };
+const CONTOH = [
+  ['budi', 'Keluarga Pak Budi', { harta: 300, istri: 1, putra: 2, putri: 1, ayah: true, ibu: true, bersama: 'seluruh', wasiat: '1/5' }],
+  ['aul', 'Bagian melebihi harta', { laki: false, suami: true, putri: 2, ayah: true, ibu: true }],
+  ['radd', 'Ada sisa harta', { putri: 1, ibu: true }],
+  ['gharrawain', 'Gharrawain', { laki: false, suami: true, ayah: true, ibu: true }],
+  ['duaistri', 'Dua istri', { harta: 160, istri: 2, putra: 1 }],
+  ['saudara', 'Ada saudara', { istri: 1, saudara: 1 }],
+];
+let f = { ...DASAR, ...CONTOH[0][2] };
+$('contoh').innerHTML = CONTOH.map(([k, l]) => `<button type="button" data-c="${k}" aria-pressed="${k === 'budi'}">${l}</button>`).join('');
+$('contoh').addEventListener('click', (e) => {
+  const b = e.target.closest('button'); if (!b) return;
+  const c = CONTOH.find(([k]) => k === b.dataset.c);
+  f = { ...DASAR, ...c[2] };
+  isiForm(); hitungUlang();
+  if (f.bersama !== 'tidak' || f.wasiat || f.raddPasangan) $('lanjutan').open = true;
+});
+const tandaiContoh = () => {
+  const cocok = CONTOH.find(([, , v]) => JSON.stringify({ ...DASAR, ...v }) === JSON.stringify(f));
+  $('contoh').querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(!!cocok && b.dataset.c === cocok[0])));
+};
+
+/* ---------- isian ---------- */
+const fmtRp = (n) => Math.round(n).toLocaleString('id-ID');
+function stepper(el) {
+  const k = el.dataset.k, min = +el.dataset.min, max = +el.dataset.max;
+  el.innerHTML = `<button type="button" aria-label="Kurangi">−</button><output aria-live="polite"></output><button type="button" aria-label="Tambah">+</button>`;
+  const [kurang, , tambah] = el.children, out = el.querySelector('output');
+  el.set = () => { out.textContent = f[k]; kurang.disabled = f[k] <= min; tambah.disabled = f[k] >= max; };
+  kurang.onclick = () => { f[k] = Math.max(min, f[k] - 1); el.set(); hitungUlang(); };
+  tambah.onclick = () => { f[k] = Math.min(max, f[k] + 1); el.set(); hitungUlang(); };
+}
+document.querySelectorAll('#form .stepper').forEach(stepper);
+function isiForm() {
+  $('harta').value = fmtRp(f.harta * 1e6);
+  document.querySelectorAll('#form .stepper').forEach((el) => el.set());
+  document.querySelectorAll('#form .saklar input').forEach((c) => { c.checked = !!f[c.dataset.k]; });
+  document.querySelectorAll('input[name="kelamin"]').forEach((r) => { r.checked = (r.value === 'laki') === f.laki; });
+  document.querySelectorAll('input[name="bersama"]').forEach((r) => { r.checked = r.value === f.bersama; });
+  $('selWasiat').value = f.wasiat;
+}
+document.querySelectorAll('#form .saklar input').forEach((c) => { c.onchange = () => { f[c.dataset.k] = c.checked; hitungUlang(); }; });
+document.querySelectorAll('input[name="kelamin"]').forEach((r) => { r.onchange = () => { f.laki = r.value === 'laki'; hitungUlang(); }; });
+document.querySelectorAll('input[name="bersama"]').forEach((r) => { r.onchange = () => { f.bersama = r.value; hitungUlang(); }; });
+$('selWasiat').onchange = (e) => { f.wasiat = e.target.value; hitungUlang(); };
+$('harta').addEventListener('input', (e) => {
+  const digit = e.target.value.replace(/\D/g, '').slice(0, 15);
+  const n = +digit || 0;
+  e.target.value = digit ? fmtRp(n) : '';
+  f.harta = n / 1e6;
+  hitungUlang(false);
+});
+
+/* ---------- hitung ---------- */
+function hitung() {
+  const fam = { laki: f.laki, istri: f.laki ? f.istri : 0, suami: f.laki ? 0 : (f.suami ? 1 : 0), putra: f.putra, putri: f.putri, ayah: f.ayah, ibu: f.ibu, saudara: f.saudara, kerabatLain: f.kerabatLain };
+  const nPas = fam.istri + fam.suami;
+  const bersama = nPas === 1 ? ({ seluruh: D.F(1), separuh: D.F(1, 2) }[f.bersama] || D.F(0)) : D.F(0);
+  const wasiat = f.wasiat ? [{ label: 'Penerima wasiat', bagian: D.F(...f.wasiat.split('/').map(Number)) }] : [];
+  try {
+    const hasil = D.bagi(f.harta || 0, fam, { bersama, wasiat, raddPasangan: f.raddPasangan });
+    return { ok: true, fam, nPas, hasil, grup: D.ringkas(hasil, f.laki), bands: D.bidangKain(hasil) };
+  } catch (e) {
+    if (!(e instanceof D.Ditolak)) throw e;
+    return { ok: false, fam, nPas, e };
+  }
+}
+
+let kain = null, akhir = null;
+function hitungUlang(animasi = true) {
+  const r = hitung(); akhir = r;
+  $('rIstri').hidden = !f.laki; $('rSuami').hidden = f.laki;
+  const bisaBersama = r.nPas === 1;
+  document.querySelectorAll('input[name="bersama"]').forEach((x) => { x.disabled = !bisaBersama && x.value !== 'tidak'; x.checked = (bisaBersama ? f.bersama : 'tidak') === x.value; });
+  $('lblBersama').innerHTML = bisaBersama ? 'Harta bersama<small>Separuhnya milik pasangan, dipisahkan sebelum faraid</small>' : 'Harta bersama<small>Hanya bisa jika pasangan tepat satu orang</small>';
+  tandaiContoh();
+  if (kain) {
+    const ada = r.ok && r.bands.some((b) => b.amount > 0);
+    if (ada) {
+      kain.atur(r.bands, { animasi: animasi && !Demo.diam });
+      if (kain.st.a < .5) kain.mode('celup', { dur: .6, animasi: !Demo.diam });
+    } else kain.mode('kosong', { dur: .5, animasi: !Demo.diam });
+    pesanKain(ada ? '' : r.ok ? 'Isi harta yang dibagi' : 'Kain dibiarkan polos');
+  }
+  renderHasil(r);
+}
+
+/* Kain polos diberi keterangan langsung di atas mori */
+function pesanKain(teks) {
+  const p = $('kainPesan');
+  if (teks === p.dataset.teks) return;
+  p.dataset.teks = teks;
+  gsap.killTweensOf(p);
+  if (!teks) { gsap.to(p, { opacity: 0, duration: Demo.diam ? 0 : .2 }); return; }
+  p.textContent = teks;
+  gsap.fromTo(p, { opacity: 0, y: 6 }, { opacity: 1, y: 0, duration: Demo.diam ? 0 : .6, delay: Demo.diam ? 0 : .35, ease: 'power2.out' });
+}
+
+function renderHasil(r) {
+  const isi = $('isiHasil');
+  if (!r.ok) {
+    $('alur').innerHTML = ''; $('alur').hidden = true;
+    isi.innerHTML = `<div class="tolak-blok"><h2>Pusaka menolak menghitung susunan ini.</h2>
+      <p class="tolak"><b>${r.e.jenis === 'InvalidFamily' ? 'Susunan tidak valid.' : 'Belum didukung.'}</b> ${r.e.message}</p>
+      <p class="redup">Lebih baik menolak daripada salah membagi. Untuk susunan seperti ini, tanyakan kepada ahli faraid atau Pengadilan Agama.</p></div>`;
+    return;
+  }
+  const h = r.hasil, pas = f.laki ? 'istri' : 'suami';
+  const wasiatJt = h.warisan - h.kolam;
+  const alur = [[`Harta`, D.jt(h.harta)]];
+  if (h.jointPasangan > 0) alur.push([`Harta bersama untuk ${pas}`, D.jt(h.jointPasangan)]);
+  if (wasiatJt > 0) alur.push(['Wasiat', D.jt(wasiatJt)]);
+  alur.push(['Dibagi menurut faraid', D.jt(h.kolam)]);
+  const alurHtml = alur.length > 2 ? alur.map(([a, b]) => `<div><small>${a}</small><b>${b}</b></div>`).join('') : '';
+  $('alur').innerHTML = alurHtml; $('alur').hidden = !alurHtml;
+  const catatan = ['aul', 'radd', 'raddPasangan', 'gharrawain'].filter((k) => h.flags.has(k)).map((k) => `<p>${D.CATATAN[k]}</p>`).join('');
+  isi.innerHTML = `<div class="rincian" id="rincian">${r.grup.map((g) => `<div class="r" data-keys="${g.keys.join(' ')}">
+      <i style="background:${g.dye}"></i>
+      <div class="nama"><b>${g.nama}</b><span class="frac">${g.fracTeks}</span></div>
+      <span class="rp">${g.n > 1 ? `${g.n} × ${D.rp(g.tiap)}` : D.rp(g.total)}</span>
+      <p>${D.alasan(g.orang[0], r.fam, h.flags)}</p></div>`).join('')}</div>
+    ${catatan ? `<div class="catatan">${catatan}</div>` : ''}`;
+}
+
+/* Sorotan dua arah: kain dan daftar */
+let sorotAkhir = '';
+function sorot(key) {
+  const k = key == null ? '' : [].concat(key).join(' ');
+  if (k === sorotAkhir || !kain) return;
+  sorotAkhir = k; kain.sorot(key);
+  const set = new Set(k.split(' '));
+  document.querySelectorAll('#rincian .r').forEach((row) => row.classList.toggle('sorot', !!k && row.dataset.keys.split(' ').some((x) => set.has(x))));
+}
+$('isiHasil').addEventListener('pointerover', (e) => { const row = e.target.closest('.r'); if (row && e.pointerType !== 'touch') sorot(row.dataset.keys.split(' ')); });
+$('isiHasil').addEventListener('pointerleave', () => sorot(null));
+
+/* ---------- kain ---------- */
+let lebarKain = 0;
+function buatKain() {
+  const host = $('kainHost');
+  host.innerHTML = '';
+  const lebar = Math.max(300, Math.round(host.clientWidth));
+  lebarKain = lebar;
+  const sempit = lebar < 600;
+  const F = sempit ? 7 : 12, B = sempit ? 12 : 22, W = lebar - 2 * F, H = Math.round(W * (sempit ? .36 : .38));
+  kain = Kain.hidup(host.appendChild(document.createElement('div')), { W, H, B, F, k: .42, q: sempit ? .6 : .5, seed: 7, mode: 'celup' });
+  kain.el.addEventListener('pointermove', (e) => {
+    if (e.pointerType === 'touch') return;
+    const rc = kain.el.getBoundingClientRect(), b = kain.bidangDi(e.clientX - rc.left, e.clientY - rc.top);
+    sorot(b ? b.pemilik : null);
+  });
+  kain.el.addEventListener('pointerleave', () => sorot(null));
+  sorotAkhir = '';
+  if (akhir && akhir.ok) kain.atur(akhir.bands, { animasi: false }); else kain.mode('kosong', { animasi: false });
+  document.documentElement.style.setProperty('--tinggi-kain', $('kainBlok').offsetHeight + 'px');
+}
+addEventListener('resize', () => { clearTimeout(window._rs); window._rs = setTimeout(() => { if (Math.abs($('kainHost').clientWidth - lebarKain) > 24) buatKain(); }, 200); });
+
+/* Alas di belakang kain hanya tampil saat kain sedang menempel */
+let rafLekat = 0;
+function cekLekat() {
+  rafLekat = 0;
+  const kb = $('kainBlok'), atas = parseFloat(getComputedStyle(kb).top) || 0;
+  kb.classList.toggle('lekat', scrollY > 0 && kb.getBoundingClientRect().top <= atas + .5);
+}
+addEventListener('scroll', () => { if (!rafLekat) rafLekat = requestAnimationFrame(cekLekat); }, { passive: true });
+
+document.fonts.ready.then(() => {
+  isiForm();
+  $('lanjutan').open = f.bersama !== 'tidak' || !!f.wasiat;
+  akhir = hitung();
+  buatKain();
+  hitungUlang(false);
+  UI.masuk('.judul-halaman .resap');
+  if (!Demo.diam) {
+    gsap.fromTo('#kainHost', { clipPath: 'inset(0 100% 0 0)' }, { clipPath: 'inset(0 0% 0 0)', duration: 1.2, ease: 'power3.inOut', delay: .15 });
+    gsap.from('.contoh button, .isian-blok > *', { opacity: 0, y: -6, duration: .6, stagger: .04, ease: 'power3.out', delay: .2 });
+  }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,145 @@
+/* Pusaka · Nila — token desain
+   Palet sogan keraton: nila (indigo), soga (coklat), mori (kain putih), prada (emas).
+   Semua warna lain diturunkan dari keempatnya. */
+
+:root {
+  /* Nila: tong celup indigo. Latar utama. */
+  --nila-950: #0e1527;
+  --nila-900: #131b33;
+  --nila-850: #17213d;
+  --nila-800: #1c2848;
+  --nila-700: #253457;
+  --nila-600: #2e406b;
+  --nila-500: #45598a;
+  --nila-400: #6b7da8;
+  --nila-300: #97a4c3;
+  --nila-200: #c4cbdc;
+
+  /* Mori: kain putih gading. Teks utama di atas nila, dasar kain. */
+  --mori-50: #f5efe3;
+  --mori-100: #ede5d4;
+  --mori-200: #dfd3bb;
+  --mori-300: #c9b997;
+
+  /* Soga: pewarna coklat dari kulit kayu soga. */
+  --soga-900: #3b2415;
+  --soga-800: #4e301c;
+  --soga-700: #674026;
+  --soga-600: #7c4e2d;
+  --soga-500: #93633a;
+  --soga-400: #ab7d4f;
+  --soga-300: #c69c6b;
+  --gading: #dbc8a0;
+
+  /* Prada: daun emas. Hanya untuk momen penting dan wakaf. */
+  --prada-500: #c4a15a;
+  --prada-300: #e3ca8e;
+
+  /* Tingi: merah-coklat, khusus pesan galat dan penolakan */
+  --tingi-600: #a24a35;   /* teks galat di tema terang (kontras 4,9 : 1) */
+  --tingi-500: #b9573f;
+  --tingi-300: #d98a72;
+
+  /* Kertas pola: kertas pensil untuk sketsa batik. Dasar tema terang. */
+  --pola-100: #e8eaef;
+  --pola-200: #dcdfe7;
+  --pola-50: #f2f3f6;
+
+  /* Peran semantik (tema gelap = tema utama) */
+  --bg: var(--nila-900);
+  --bg-deep: var(--nila-950);
+  --surface: var(--nila-850);
+  --surface-2: var(--nila-800);
+  --paper: var(--mori-100);          /* kartu/label berbahan kertas */
+  --ink-on-paper: var(--nila-900);
+  --text: var(--mori-50);
+  --text-2: var(--nila-200);
+  --text-3: var(--nila-300);
+  --line: rgb(245 239 227 / .12);
+  --line-2: rgb(245 239 227 / .22);
+  --line-hover: var(--mori-300);
+  --wash: rgb(245 239 227 / .05);    /* sapuan tipis saat hover/tekan */
+  --track: var(--nila-700);          /* rel saklar dan jalur progres */
+  --focus: var(--prada-300);
+  --accent: var(--prada-500);
+  --danger: var(--tingi-300);
+  --btn-bg: var(--mori-50);
+  --btn-fg: var(--nila-900);
+  --btn-bg-hover: #fffaf0;
+  --bayang-kain: .55;
+
+  /* Huruf: Gambetta (serif) + Ranade (sans) */
+  --font-serif: 'Gambetta', 'Iowan Old Style', Georgia, serif;
+  --font-sans: 'Ranade', 'Segoe UI', system-ui, sans-serif;
+  --font-jawa: 'Noto Sans Javanese', sans-serif;
+
+  /* Skala huruf layar (dasar 16px, rasio ±1.25) */
+  --t-micro: 12.5px;
+  --t-small: 14px;
+  --t-body: 16.5px;
+  --t-lead: 19px;
+  --t-h3: 23px;
+  --t-h2: 30px;
+  --t-h1: 42px;
+  --t-display: 60px;
+  --t-hero: 84px;
+
+  /* Spasi (kelipatan 4) */
+  --s-1: 4px;  --s-2: 8px;  --s-3: 12px; --s-4: 16px; --s-5: 24px;
+  --s-6: 32px; --s-7: 48px; --s-8: 64px; --s-9: 96px; --s-10: 128px;
+
+  /* Bentuk: kain dan kertas bersudut tajam, kontrol sedikit membulat */
+  --r-0: 0;
+  --r-1: 3px;
+  --r-pill: 999px;
+
+  /* Bayangan: kain diletakkan di atas meja gelap */
+  --shadow-kain: 0 30px 60px -20px rgb(5 8 18 / .65), 0 8px 18px -6px rgb(5 8 18 / .5);
+  --shadow-label: 0 10px 22px -10px rgb(5 8 18 / .7);
+  --shadow-sheet: 0 40px 90px -30px rgb(3 6 14 / .8);
+
+  /* Gerak */
+  --dur-1: 160ms;   /* respons mikro: hover, tekan */
+  --dur-2: 280ms;   /* ganti status kecil */
+  --dur-3: 480ms;   /* masuk/keluar elemen */
+  --dur-4: 800ms;   /* resapan teks */
+  --dur-5: 1400ms;  /* goresan canting */
+  --dur-6: 2400ms;  /* celupan */
+  --ease-resap: cubic-bezier(.2, .7, .1, 1);       /* masuk, mengendap */
+  --ease-canting: cubic-bezier(.45, .05, .55, .95); /* kecepatan tangan, rata */
+  --ease-angkat: cubic-bezier(.65, 0, .35, 1);     /* perpindahan berat */
+
+  color-scheme: dark;
+}
+
+/* Tema terang "kertas pola": kalkulator di HP siang hari, dokumen cetak.
+   Sengaja dingin (abu kebiruan) agar kain mori yang hangat tetap menonjol. */
+:root[data-tema="terang"] {
+  --bg: var(--pola-100);
+  --bg-deep: var(--pola-200);
+  --surface: var(--pola-50);
+  --surface-2: #f8f9fb;
+  --paper: #fbfaf6;
+  --text: var(--nila-900);
+  --text-2: var(--nila-700);
+  --text-3: #58627f;
+  --line: rgb(19 27 51 / .12);
+  --line-2: rgb(19 27 51 / .26);
+  --line-hover: var(--nila-500);
+  --wash: rgb(19 27 51 / .05);
+  --track: #c3c8d6;
+  --focus: var(--nila-600);
+  --accent: var(--soga-600);
+  --danger: var(--tingi-600);
+  --btn-bg: var(--nila-900);
+  --btn-fg: var(--mori-50);
+  --btn-bg-hover: var(--nila-800);
+  --bayang-kain: .28;
+  --shadow-label: 0 10px 22px -12px rgb(19 27 51 / .35);
+  --shadow-sheet: 0 40px 90px -30px rgb(19 27 51 / .45);
+  color-scheme: light;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root { --dur-1: 0ms; --dur-2: 0ms; --dur-3: 0ms; --dur-4: 0ms; --dur-5: 0ms; --dur-6: 0ms; }
+}

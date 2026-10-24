@@ -1,0 +1,348 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='4' fill='%23131b33'/%3E%3Crect x='4.5' y='4.5' width='15' height='15' fill='none' stroke='%23f5efe3' stroke-width='1.4'/%3E%3Cpath d='M8 19.5 12.4 4.5M12 19.5 16.3 4.5' stroke='%23f5efe3' stroke-width='1.4'/%3E%3C/svg%3E">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#131b33">
+<title>Pusaka — harta pusaka digital, dibagi sesuai faraid</title>
+<link rel="stylesheet" href="assets/fonts.css">
+<link rel="stylesheet" href="assets/tokens.css">
+<link rel="stylesheet" href="assets/base.css">
+<style>
+  main { padding: 0 var(--gutter) 64px; max-width: 1520px; margin: 0 auto; }
+  .atas { max-width: 1520px; margin: 0 auto; }
+  .atas nav { display: flex; gap: 28px; align-items: center; }
+  .atas nav a { font-size: 15px; color: var(--text-2); text-decoration: none; }
+  .atas nav a:hover { color: var(--text); }
+
+  /* Pembuka: judul kiri, ajakan kanan, rata bawah */
+  .pembuka { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: 32px 64px; align-items: end; padding-top: clamp(20px, 3.5vh, 48px); }
+  .pembuka h1 { font: 400 clamp(44px, 5.6vw, 84px)/.98 var(--font-serif); letter-spacing: -.02em; text-wrap: balance; }
+  .pembuka .ajak p { font-size: 18px; line-height: 1.6; color: var(--text-2); max-width: 34em; }
+  .pembuka .tombol { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 24px; }
+
+  /* Kain contoh + label gantung, satu panggung kecil yang diskalakan */
+  .contoh-kain { margin-top: clamp(22px, 3.5vh, 44px); }
+  .narasi { font: 400 italic clamp(19px, 1.7vw, 24px)/1.3 var(--font-serif); color: var(--text-2); min-height: 1.3em; }
+  .panggung { position: relative; margin-top: 14px; }
+  .panggung .papan { position: absolute; left: 0; top: 0; width: 1760px; height: 696px; transform-origin: 0 0; }
+  .panggung .tali { position: absolute; inset: 0; width: 1760px; height: 696px; pointer-events: none; overflow: visible; }
+  .panggung .redam { position: absolute; left: 0; top: 0; pointer-events: none; overflow: visible; }
+  .label-kain.pg { position: absolute; top: 548px; width: 156px; padding: 24px 14px 12px; cursor: default; transition: opacity var(--dur-2), translate var(--dur-2) var(--ease-resap); }
+  .label-kain.pg.lebar { width: 224px; }
+  .label-kain.pg .pita { position: absolute; left: 0; right: 0; top: 0; height: 6px; }
+  .label-kain.pg .peran { font: 500 18px/1.2 var(--font-sans); color: var(--nila-800); white-space: nowrap; }
+  .label-kain.pg .frac { display: block; font-size: 21px; line-height: 1.2; color: var(--soga-700); margin-top: 4px; }
+  .label-kain.pg .nominal { display: block; font: 400 32px/1.1 var(--font-serif); color: var(--nila-900); margin-top: 6px; white-space: nowrap; }
+  .panggung.menyorot .label-kain.pg:not(.sorot) { opacity: .38; }
+  .panggung .label-kain.pg.sorot { translate: 0 -6px; }
+  .legenda { display: none; }
+
+  /* Cara kerja: tiga keadaan kain = tiga keadaan dompet */
+  .cara { margin-top: clamp(64px, 10vh, 120px); display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); gap: 40px 64px; }
+  .cara > header h2 { font: 400 var(--t-h1)/1.08 var(--font-serif); letter-spacing: -.01em; }
+  .cara > header p { margin-top: 14px; color: var(--text-2); max-width: 26em; }
+  .langkah { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px; list-style: none; padding: 0; counter-reset: l; }
+  .langkah li { counter-increment: l; }
+  .langkah .cth { width: 100%; aspect-ratio: 5 / 3; position: relative; }
+  .langkah .cth > div { position: absolute !important; inset: 0; }
+  .langkah .gloss { margin-top: 12px; font: 400 italic 16px/1.35 var(--font-serif); color: var(--text-3); }
+  .langkah h3 { margin-top: 18px; font: 400 25px/1.15 var(--font-serif); display: flex; gap: 12px; align-items: baseline; }
+  .langkah h3::before { content: counter(l); font: 400 italic 20px/1 var(--font-serif); color: var(--prada-300); }
+  .langkah p { margin-top: 10px; color: var(--text-2); font-size: 16px; line-height: 1.6; }
+
+  /* Batas yang dijaga */
+  .batas { margin-top: clamp(64px, 9vh, 104px); display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); gap: 24px 64px; padding-top: 32px; border-top: 1px solid var(--line); }
+  .batas h2 { font: 400 var(--t-h2)/1.15 var(--font-serif); }
+  .batas p { color: var(--text-2); max-width: 40em; font-size: 17px; line-height: 1.65; }
+  .batas p + p { margin-top: 12px; }
+
+  /* Layar demo */
+  .layar { margin-top: clamp(56px, 8vh, 96px); display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); gap: 24px 64px; padding-top: 32px; border-top: 1px solid var(--line); }
+  .layar h2 { font: 400 var(--t-h2)/1.15 var(--font-serif); }
+  .layar > div > p { margin-top: 10px; color: var(--text-3); font-size: 15px; max-width: 24em; }
+  .daftar-layar { list-style: none; padding: 0; border-top: 1px solid var(--line); }
+  .daftar-layar a { display: grid; grid-template-columns: 180px 160px 1fr 24px; gap: 16px; align-items: baseline; padding: 16px 0; border-bottom: 1px solid var(--line); text-decoration: none; transition: background var(--dur-1); }
+  .daftar-layar a:hover { background: var(--wash); }
+  .daftar-layar b { font: 400 22px/1.2 var(--font-serif); }
+  .daftar-layar .alat { color: var(--text-3); font-size: 14.5px; }
+  .daftar-layar .isi-l { color: var(--text-2); font-size: 15.5px; }
+  .daftar-layar svg { width: 16px; height: 16px; color: var(--text-3); align-self: center; transition: transform var(--dur-2) var(--ease-resap), color var(--dur-1); }
+  .daftar-layar a:hover svg { transform: translateX(3px); color: var(--text); }
+
+  .kaki { margin-top: 64px; display: flex; justify-content: space-between; gap: 24px; flex-wrap: wrap; align-items: end; }
+  .kaki .peringatan { max-width: 46em; }
+
+  @media (max-width: 1080px) {
+    .cara, .batas, .layar { grid-template-columns: 1fr; }
+    .pembuka { grid-template-columns: 1fr; align-items: start; }
+  }
+  @media (max-width: 720px) {
+    .atas nav .jaringan { display: none; }
+    .pembuka .tombol .btn { flex: 1 1 auto; }
+    .langkah { grid-template-columns: 1fr; gap: 40px; }
+    .panggung .tali, .panggung .label-kain.pg { display: none; }
+    .legenda { display: grid; grid-template-columns: 1fr; gap: 0; margin-top: 16px; font-size: 15px; border-top: 1px solid var(--line); }
+    .legenda span { display: flex; gap: 12px; align-items: center; color: var(--text-2); padding: 9px 0; border-bottom: 1px solid var(--line); }
+    .legenda i { width: 12px; height: 12px; flex: none; }
+    .legenda b { margin-left: auto; font-weight: 500; color: var(--text); font-variant-numeric: tabular-nums; }
+    .daftar-layar a { grid-template-columns: 1fr 24px; gap: 2px 12px; }
+    .daftar-layar .alat { grid-column: 1; }
+    .daftar-layar .isi-l { grid-column: 1; }
+    .daftar-layar svg { grid-row: 1 / span 3; grid-column: 2; }
+  }
+</style>
+</head>
+<body>
+<header class="atas">
+  <a class="merek" href="index.html" aria-label="Pusaka, beranda"><span id="logo"></span><b>Pusaka</b><span class="aksara" lang="jv">ꦥꦸꦱꦏ</span></a>
+  <nav>
+    <a href="kalkulator.html">Kalkulator faraid</a>
+    <span class="jaringan" id="jaringan"><i></i><span>Monad testnet</span><span>blok <b>0</b></span></span>
+  </nav>
+</header>
+
+<main>
+  <section class="pembuka">
+    <h1 class="resap" id="judul">Harta pusaka digital, dibagi sesuai faraid.</h1>
+    <div class="ajak">
+      <p class="resap" style="--i:2">Aturan warisan dipasang di dompetmu sendiri. Setelah dua dari tiga saksi mengonfirmasi wafat dan masa sanggah lewat, bagian tiap ahli waris masuk ke rekening banknya, atau ke amplop digital yang dicairkan dari HP. Ahli waris tidak perlu dompet kripto, dan kamu tidak perlu menekan tombol apa pun untuk membuktikan masih hidup.</p>
+      <div class="tombol resap" style="--i:3">
+        <a class="btn" href="pewaris.html" id="mulai">Mulai demo</a>
+        <a class="btn btn--garis" href="kalkulator.html">Buka kalkulator faraid</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="contoh-kain" aria-label="Contoh pembagian harta Budi Santoso">
+    <p class="narasi" id="narasi">Dompet Budi Santoso berisi Rp300 juta.</p>
+    <div class="panggung" id="panggung">
+      <div class="papan" id="papan">
+        <div id="kain"></div>
+        <svg class="tali" id="tali" viewBox="0 0 1760 696" aria-hidden="true"></svg>
+        <div id="labels"></div>
+      </div>
+    </div>
+    <div class="legenda" id="legenda"></div>
+  </section>
+
+  <section class="cara">
+    <header>
+      <h2>Tiga keadaan kain, tiga keadaan dompet.</h2>
+      <p>Di setiap layar Pusaka, harta digambarkan sebagai sehelai kain batik. Garis lilinnya adalah aturan warisan, dan pewarnanya adalah harta yang sudah sampai ke tangan ahli waris.</p>
+    </header>
+    <ol class="langkah">
+      <li>
+        <div class="cth" id="cth1"></div>
+        <p class="gloss">Garis lilin: aturan sudah terpasang.</p>
+        <h3>Pasang aturan di dompetmu</h3>
+        <p>Satu transaksi EIP-7702 menambahkan aturan warisan ke dompetmu sendiri. Hartanya tidak dipindah dan kuncinya tetap di tanganmu. Setiap transaksimu otomatis tercatat sebagai bukti hidup, dan selama hidup kamu bebas mengubah atau mencabut aturannya.</p>
+      </li>
+      <li>
+        <div class="cth" id="cth2"></div>
+        <p class="gloss">Rendaman: masa sanggah berjalan.</p>
+        <h3>Dua saksi mengonfirmasi wafat</h3>
+        <p>Kamu memilih tiga saksi. Mereka cukup menandatangani, tanpa biaya. Setelah dua di antaranya mengonfirmasi, masa sanggah dimulai. Jika kamu ternyata masih hidup, satu transaksi apa pun atau satu sentuhan pada pengingat di HP membatalkan semuanya.</p>
+      </li>
+      <li>
+        <div class="cth" id="cth3"></div>
+        <p class="gloss">Pewarna: bagian sudah diterima.</p>
+        <h3>Bagian dikirim sesuai faraid</h3>
+        <p>Setelah masa sanggah lewat, siapa pun bisa menekan "Bagikan warisan". Kontrak memisahkan harta bersama, menjalankan wasiat, lalu membagi sisanya menurut faraid. Bagian untuk rekening bank ditukar ke rupiah oleh mitra pencairan dan ditransfer lewat BI-FAST. Ahli waris tidak perlu menekan apa pun.</p>
+      </li>
+    </ol>
+  </section>
+
+  <section class="batas">
+    <h2>Lebih baik menolak daripada salah membagi.</h2>
+    <div>
+      <p>Pusaka menghitung ahli waris inti menurut KHI: pasangan, anak laki-laki, anak perempuan, ayah, dan ibu, termasuk ʻaul, radd, dan gharrawain. Jika saudara, cucu, atau kakek ikut mewarisi, Pusaka menolak membuat aturan dan menjelaskan alasannya.</p>
+      <p>Penetapan ahli waris tetap bisa lewat Pengadilan Agama. Pusaka menjalankan pembagian yang sudah kamu tetapkan semasa hidup.</p>
+    </div>
+  </section>
+
+  <section class="layar">
+    <div>
+      <h2>Layar demo</h2>
+      <p>Buka di perangkat yang berbeda. Semua layar mengikuti status dompet yang sama.</p>
+    </div>
+    <ul class="daftar-layar" id="daftarLayar"></ul>
+  </section>
+
+  <footer class="kaki">
+    <p class="peringatan">Prototipe di Monad testnet dengan rupiah mainan (tIDR). Transfer bank disimulasikan. Kunci demo hanya untuk testnet, jangan pernah memakai private key dompet asli. Bukan nasihat hukum atau fatwa.</p>
+    <span class="t-micro">Monad Blitz Jogja Vol. 2</span>
+  </footer>
+</main>
+
+<script type="module">
+import '/src/boot.js';
+const D = Pusaka;
+Latar.pasang();
+Demo.panel({ judul: 'Panel demo' });
+document.getElementById('logo').outerHTML = UI.MEREK;
+UI.blok(document.getElementById('jaringan'));
+
+/* ---------- daftar layar ---------- */
+const PANAH = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 8h11M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.3"/></svg>';
+document.getElementById('daftarLayar').innerHTML = [
+  ['pewaris.html', 'Pewaris', 'Laptop', 'Memasang aturan dan memilih cara terima tiap ahli waris.'],
+  ['kabar.html', 'HP pewaris', 'HP atau laptop', 'Bukti hidup tanpa tombol: aktivitas dompet dan pengingat.'],
+  ['saksi.html', 'Saksi', 'Laptop', 'Tiga saksi menandatangani konfirmasi wafat, tanpa biaya.'],
+  ['panggung.html', 'Panggung', 'Proyektor', 'Kain besar untuk ditonton seisi ruangan.'],
+  ['waris.html', 'Ahli waris', 'HP penonton', 'Bagian tiap orang: ke rekening bank, amplop digital, atau dompet kripto.'],
+  ['mitra.html', 'Mitra pencairan', 'Laptop', 'Simulasi bank: tIDR menjadi rupiah di rekening.'],
+  ['hp.html', 'Simulasi HP', 'Laptop', 'HP pewaris dan HP ahli waris berdampingan.'],
+  ['kalkulator.html', 'Kalkulator', 'HP atau laptop', 'Hitung bagian untuk keluarga sendiri.'],
+].map(([h, n, a, t]) => `<li><a href="${h}"><b>${n}</b><span class="alat">${a}</span><span class="isi-l">${t}</span>${PANAH}</a></li>`).join('');
+
+// "Mulai demo" langsung membuka layar Pewaris. Pewaris baru dibuat dari panel demo.
+
+/* ---------- kain contoh, sama persis dengan kain di Panggung ---------- */
+const papan = document.getElementById('papan'), panggung = document.getElementById('panggung');
+const kain = Kain.buat(document.getElementById('kain'), { W: 1732, H: 430, B: 32, F: 14, k: .42, bands: D.bidang, q: .55, seed: 7 });
+const BIDANG_DARI = { istri: [0, 1], masjid: [2], putra1: [3], putra2: [4], putri: [5], ayah: [6], ibu: [7] };
+const FRAC = { istri: '1/2 bersama + 1/8', masjid: '1/5 wasiat', putra1: '13/60', putra2: '13/60', putri: '13/120', ayah: '1/6', ibu: '1/6' };
+const PENDEK = { istri: 'Istri', masjid: 'Wakaf masjid', putra1: 'Putra pertama', putra2: 'Putra kedua', putri: 'Putri', ayah: 'Ayah', ibu: 'Ibu' };
+const LABEL_Y = 548, NS = 'http://www.w3.org/2000/svg';
+const labelsEl = document.getElementById('labels'), tali = document.getElementById('tali');
+const labels = D.penerima.map((p) => {
+  const idx = BIDANG_DARI[p.id], w = p.id === 'istri' ? 224 : 156;
+  const div = document.createElement('div');
+  div.className = 'label-kain pg' + (p.id === 'istri' ? ' lebar' : '');
+  div.innerHTML = `<span class="pita" style="background:${p.dye}"></span><div class="peran">${PENDEK[p.id]}</div><span class="frac">${FRAC[p.id]}</span><span class="nominal">${D.jt(p.total)}</span>`;
+  labelsEl.appendChild(div);
+  return { p, idx, w, div, anchor: kain.titikBawah(idx[0])[0], x: 0 };
+});
+(function aturLabel() {
+  const GAP = 10, MIN = 0, MAX = 1760;
+  labels.forEach((l) => { l.x = l.anchor - l.w / 2; });
+  for (let i = 1; i < labels.length; i++) labels[i].x = Math.max(labels[i].x, labels[i - 1].x + labels[i - 1].w + GAP);
+  const last = labels[labels.length - 1];
+  if (last.x + last.w > MAX) { last.x = MAX - last.w; for (let i = labels.length - 2; i >= 0; i--) labels[i].x = Math.min(labels[i].x, labels[i + 1].x - labels[i].w - GAP); }
+  if (labels[0].x < MIN) labels[0].x = MIN;
+  labels.forEach((l) => { l.div.style.left = l.x + 'px'; });
+})();
+const taliEls = [], peniti = [];
+labels.forEach((l) => {
+  l.idx.forEach((bi) => {
+    const [x1, y0] = kain.titikBawah(bi), y1 = y0 - 12, x2 = l.x + l.w / 2, y2 = LABEL_Y + 11;
+    const path = document.createElementNS(NS, 'path');
+    path.setAttribute('d', `M${x1} ${y1} C ${x1} ${y1 + 60}, ${x2} ${y2 - 50}, ${x2} ${y2}`);
+    path.setAttribute('fill', 'none'); path.setAttribute('stroke', '#e9dfc9'); path.setAttribute('stroke-opacity', '.55'); path.setAttribute('stroke-width', '1.3');
+    tali.appendChild(path); taliEls.push(path);
+    const pin = document.createElementNS(NS, 'circle');
+    pin.setAttribute('cx', x1); pin.setAttribute('cy', y1); pin.setAttribute('r', 3.6); pin.setAttribute('fill', '#e3ca8e');
+    tali.appendChild(pin); peniti.push(pin);
+  });
+});
+
+/* Redam: bayangan tipis di atas bidang yang tidak disorot */
+const redam = document.createElementNS(NS, 'svg');
+redam.setAttribute('class', 'redam');
+redam.setAttribute('viewBox', `${-kain.F} ${-kain.B} ${kain.W + 2 * kain.F} ${kain.H + 2 * kain.B}`);
+redam.setAttribute('width', kain.W + 2 * kain.F); redam.setAttribute('height', kain.H + 2 * kain.B);
+const redamPoly = kain.info.map((inf) => {
+  const pg = document.createElementNS(NS, 'polygon');
+  pg.setAttribute('points', inf.poly.map((p) => p.join(',')).join(' '));
+  pg.setAttribute('fill', '#0e1527'); pg.style.opacity = 0; pg.style.transition = 'opacity .28s';
+  redam.appendChild(pg);
+  return pg;
+});
+document.getElementById('kain').appendChild(redam);
+const pemilik = D.bidang.map((b) => b.id);
+let sorotan = null;
+function sorot(id) {
+  if (id === sorotan) return;
+  sorotan = id;
+  panggung.classList.toggle('menyorot', !!id);
+  redamPoly.forEach((pg, i) => { pg.style.opacity = id && pemilik[i] !== id ? .55 : 0; });
+  labels.forEach((l) => l.div.classList.toggle('sorot', l.p.id === id));
+}
+
+/* Skala papan mengikuti lebar konten */
+let skalaPapan = 1;
+function skala() {
+  const w = panggung.clientWidth;
+  skalaPapan = w / 1760;
+  papan.style.transform = `scale(${skalaPapan})`;
+  const sempit = innerWidth <= 720;
+  panggung.style.height = ((sempit ? 494 : 676) * skalaPapan) + 'px';
+}
+skala(); addEventListener('resize', skala);
+
+let siapSorot = false;
+panggung.addEventListener('pointermove', (e) => {
+  if (!siapSorot || e.pointerType === 'touch') return;
+  const r = papan.getBoundingClientRect();
+  const x = (e.clientX - r.left) / skalaPapan, y = (e.clientY - r.top) / skalaPapan;
+  const lab = e.target.closest('.label-kain');
+  if (lab) { sorot(labels.find((l) => l.div === lab).p.id); return; }
+  const bi = kain.bidangDi(x, y);
+  sorot(bi >= 0 ? pemilik[bi] : null);
+});
+panggung.addEventListener('pointerleave', () => sorot(null));
+
+/* Legenda untuk layar sempit (label gantung disembunyikan) */
+document.getElementById('legenda').innerHTML = D.penerima.map((p) => `<span><i style="background:${p.dye}"></i>${PENDEK[p.id]}<b>${D.jt(p.total)}</b></span>`).join('');
+
+/* ---------- tiga contoh kain: lilin, rendaman, celup ---------- */
+function contoh(id, keadaan) {
+  const host = document.getElementById(id);
+  const w = Math.round(host.clientWidth), h = Math.round(w * .6);
+  const c = Kain.contoh(host.appendChild(document.createElement('div')), { w, h, dye: '#7c4e2d', isen: 'truntum', q: .8, seed: 11 });
+  if (keadaan === 'lilin') c.awal();
+  if (keadaan === 'rendam') { c.awal(); c.celup.soak = .42; }
+  if (keadaan === 'celup') c.akhir();
+  return c;
+}
+
+/* ---------- koreografi pembuka ---------- */
+const narasi = document.getElementById('narasi');
+function setNarasi(t) {
+  if (Demo.diam) { narasi.textContent = t; return; }
+  gsap.timeline().to(narasi, { opacity: 0, y: 6, duration: .25, ease: 'power1.in' })
+    .call(() => { narasi.textContent = t; }).set(narasi, { opacity: 1, y: 0 })
+    .call(() => UI.masuk(narasi));
+}
+function akhir() {
+  kain.keadaanAkhir({ potong: false });
+  gsap.set(taliEls, { strokeDasharray: 'none', strokeDashoffset: 0 });
+  narasi.textContent = 'Rp300 juta terbagi habis kepada tujuh penerima.';
+  siapSorot = true;
+}
+function pembukaan() {
+  gsap.set(labels.map((l) => l.div), { opacity: 0, y: -24 });
+  gsap.set(peniti, { opacity: 0 });
+  taliEls.forEach((t) => { const L = t.getTotalLength(); gsap.set(t, { strokeDasharray: L, strokeDashoffset: L }); });
+  const tl = gsap.timeline({ onComplete: () => { siapSorot = true; } });
+  tl.fromTo('#kain', { clipPath: 'inset(0 100% 0 0)' }, { clipPath: 'inset(0 0% 0 0)', duration: 1.5, ease: 'power3.inOut' }, .5)
+    .add(kain.nyanting(), 1.3)
+    .call(() => setNarasi('Aturannya dipasang di dompet itu sendiri.'), null, 1.4)
+    .to(peniti, { opacity: 1, duration: .3, stagger: .05 }, 3.4)
+    .to(taliEls, { strokeDashoffset: 0, duration: .8, stagger: .05, ease: 'power2.out' }, 3.5)
+    .to(labels.map((l) => l.div), { opacity: 1, y: 0, duration: .9, stagger: .07, ease: 'power3.out' }, 3.8)
+    .call(() => setNarasi('Pertama, harta bersama: separuh untuk istri.'), null, 4.9)
+    .add(kain.celupBidang(0, 2.2), 5.1)
+    .call(() => setNarasi('Lalu wasiat: seperlima harta warisan untuk wakaf masjid.'), null, 6.6)
+    .add(kain.celupBidang(2, 1.8), 6.8)
+    .call(() => setNarasi('Sisanya, Rp120 juta, dibagi menurut faraid.'), null, 8.2);
+  [1, 3, 4, 5, 6, 7].forEach((bi, k) => tl.add(kain.celupBidang(bi, 2.2), 8.4 + k * .12));
+  tl.add(kain.nglorod(), 10.6)
+    .call(() => setNarasi('Rp300 juta terbagi habis kepada tujuh penerima.'), null, 11.4);
+  labels.forEach((l, i) => {
+    gsap.set(l.div, { transformOrigin: '50% 11px' });
+    tl.to(l.div, { keyframes: { rotation: [2.4, -1.5, .9, -.4, 0] }, duration: 1.9, ease: 'sine.inOut' }, 4.3 + i * .05);
+  });
+  return tl;
+}
+
+document.fonts.ready.then(() => {
+  UI.masuk('.pembuka .resap');
+  contoh('cth1', 'lilin'); contoh('cth2', 'rendam'); contoh('cth3', 'celup');
+  if (Demo.diam) akhir(); else pembukaan();
+});
+</script>
+</body>
+</html>

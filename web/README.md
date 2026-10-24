@@ -101,6 +101,19 @@ Aturan Monad yang tidak ada di anvil (sudah ditangani `src/chain.js` dan `kirimM
 - **Biaya = batas gas**, bukan gas terpakai. Satu putaran demo memakai ±0,7 MON dari dompet induk.
 - Dompet pewaris yang sudah memakai EIP-7702 punya kode, jadi menerima MON butuh sedikit di atas 21.000 gas.
 
+## Hosting publik (GitHub Pages)
+
+Kunci dompet induk ikut terbawa ke browser, jadi versi publik memakai **dompet induk terpisah bersaldo kecil**:
+
+```bash
+node scripts/siapkan-publik.mjs     # buat .env.publik.local (kunci baru), isi 1,5 MON dari induk utama, daftarkan operatornya
+npx vite build --mode publik --base ./
+```
+
+Lalu isi `dist/` (ditambah berkas kosong `.nojekyll`) di-push ke branch `gh-pages`. Situsnya:
+https://astrorehan.github.io/pusaka/. Isi ulang saldo induk publik dengan `MON=1.5 node scripts/siapkan-publik.mjs`
+(hanya menambah sampai jumlah itu).
+
 ## Yang perlu diketahui
 
 - Kunci demo (pewaris dan 3 saksi) dibuat dan disimpan di `localStorage` browser ini. Jangan pernah memakai kunci
